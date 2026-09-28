@@ -67,16 +67,11 @@ echo ""
 
 # 5. Launch iLoader Sideload Tool
 echo -e "${YELLOW}[4/4] Launching iLoader Sideload Tool for Linux...${NC}"
-ILOADER_BIN="$SCRIPT_DIR/tools/iloader.AppImage"
+ILOADER_BIN="$SCRIPT_DIR/tools/squashfs-root/AppRun"
 
-if [ ! -f "$ILOADER_BIN" ] || [ ! -x "$ILOADER_BIN" ]; then
-    echo -e "${YELLOW}Waiting for iLoader download to complete in background...${NC}"
-    while [ ! -f "$ILOADER_BIN" ] || [ $(stat -c%s "$ILOADER_BIN" 2>/dev/null || echo 0) -lt 80000000 ]; do
-        sleep 3
-        echo -n "."
-    done
-    chmod +x "$ILOADER_BIN"
-    echo ""
+if [ ! -f "$ILOADER_BIN" ]; then
+    echo -e "${YELLOW}Extracting iLoader AppImage...${NC}"
+    (cd "$SCRIPT_DIR/tools" && ./iloader.AppImage --appimage-extract)
 fi
 
 echo -e "${GREEN}================================================================${NC}"
