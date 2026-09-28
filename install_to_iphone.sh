@@ -65,14 +65,8 @@ fi
 echo -e "${GREEN}✓ Package ready at: ${CYAN}$IPA_PATH${NC} ($(ls -lh "$IPA_PATH" | awk '{print $5}'))"
 echo ""
 
-# 5. Launch iLoader Sideload Tool
-echo -e "${YELLOW}[4/4] Launching iLoader Sideload Tool for Linux...${NC}"
-ILOADER_BIN="$SCRIPT_DIR/tools/squashfs-root/AppRun"
-
-if [ ! -f "$ILOADER_BIN" ]; then
-    echo -e "${YELLOW}Extracting iLoader AppImage...${NC}"
-    (cd "$SCRIPT_DIR/tools" && ./iloader.AppImage --appimage-extract)
-fi
+# 5. Launch Native iLoader Tool
+echo -e "${YELLOW}[4/4] Launching Native iLoader Sideload Tool...${NC}"
 
 echo -e "${GREEN}================================================================${NC}"
 echo -e "${GREEN}  🎉 Starting iLoader GUI (Native Linux Sideloading Tool)        ${NC}"
@@ -91,5 +85,5 @@ echo -e " • إذا طلب منك Developer Mode: اذهب إلى ${YELLOW}ال
 echo ""
 echo -e "${GREEN}جاري تشغيل iLoader الآن...${NC}"
 
-cd "$SCRIPT_DIR/tools/squashfs-root/usr"
-exec ./bin/iloader "$@"
+export WEBKIT_DISABLE_DMABUF_RENDERER=1
+exec /usr/bin/iloader "$@"
