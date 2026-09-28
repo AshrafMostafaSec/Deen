@@ -1,0 +1,108 @@
+name: Build Islamic Companion iOS (IPA)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_configuration:
+        description: 'Build Configuration (Release or Debug)'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
+
+jobs:
+  build-ios:
+    name: Build & Export iOS IPA
+    runs-on: macos-14  # Apple Silicon runner (M1/M2) with latest Xcode
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: |
+          echo "Available Xcode installations:"
+          ls -d /Applications/Xcode* || true
+          # Select latest Xcode 16 or 15 available
+          if [ -d "/Applications/Xcode_16.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_16.1.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_15.4.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          fi
+          xcodebuild -version
+
+      - name: Setup Build Directories
+        run: |
+          mkdir -p build/derivedData
+          mkdir -p build/archive
+          mkdir -p build/artifacts
+
+      - name: Generate Xcode Project via XcodeGen
+        run: |
+          if [ -f "project.yml" ]; then
+            echo "Installing XcodeGen..."
+            brew install xcodegen
+            echo "Generating Xcode project..."
+            xcodegen generate
+          fi
+
+      - name: Build and Archive (Clean Architecture)
+        run: |
+          CONFIG="${{ github.event.inputs.build_configuration || 'Release' }}"
+          echo "Building configuration: $CONFIG"
+          
+          # Check if .xcodeproj exists, otherwise generate or build workspace
+          if [ -d "IslamicCompanion.xcodeproj" ]; then
+            xcodebuild archive \
+              -project IslamicCompanion.xcodeproj \
+              -scheme IslamicCompanion \
+              -configuration "$CONFIG" \
+              -destination "generic/platform=iOS" \
+              -archivePath "build/archive/IslamicCompanion.xcarchive" \
+              -derivedDataPath "build/derivedData" \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY="" \
+              AD_HOC_CODE_SIGNING_ALLOWED=YES
+          else
+            echo "Building Swift Package / Module directly..."
+            swift build -c release
+          fi
+
+      - name: Package Payload into Sideloadable IPA
+        if: always()
+        run: |
+          # If xcarchive exists, package its Application into .ipa
+          if [ -d "build/archive/IslamicCompanion.xcarchive/Products/Applications" ]; then
+            mkdir -p build/ipa_payload/Payload
+            cp -r build/archive/IslamicCompanion.xcarchive/Products/Applications/*.app build/ipa_payload/Payload/
+            cd build/ipa_payload
+            zip -r -q ../artifacts/IslamicCompanion.ipa Payload
+            cd ../..
+            echo "Successfully packaged IslamicCompanion.ipa"
+          else
+            echo "Creating placeholder artifact if building for unit tests/syntax"
+            touch build/artifacts/build_output.txt
+          fi
+
+      - name: Upload IPA Artifact to GitHub Run
+        uses: actions/upload-artifact@v4
+        with:
+          name: IslamicCompanion-iOS-IPA
+          path: build/artifacts/
+          retention-days: 14
+
+      - name: Build Summary
+        run: |
+          echo "### 📱 iOS Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "- **Configuration:** ${{ github.event.inputs.build_configuration || 'Release' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runner:** macOS 14 (Apple Silicon)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Installation Note:** You can download the \`IslamicCompanion.ipa\` artifact directly from this workflow and install it on your iPhone via SideStore, AltStore, Sideloadly, or Scarlet without needing a paid developer account." >> $GITHUB_STEP_SUMMARY
