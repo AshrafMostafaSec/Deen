@@ -262,7 +262,7 @@ public final class AudioService: NSObject {
         )
     }
     
-    nonisolated @objc private func handleInterruption(notification: Notification) {
+    @objc nonisolated private func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
@@ -295,7 +295,7 @@ public final class AudioService: NSObject {
         }
     }
     
-    nonisolated @objc private func handleRouteChange(notification: Notification) {
+    @objc nonisolated private func handleRouteChange(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }
