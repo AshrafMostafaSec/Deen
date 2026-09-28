@@ -38,47 +38,56 @@ public final class LocationService: NSObject, CLLocationManagerDelegate {
     
     // MARK: - CLLocationManagerDelegate
     
-    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
-        switch manager.authorizationStatus {
-        case .authorizedWhenInUse, .authorizedAlways:
-            locationManager.requestLocation()
-            startHeadingUpdates()
-            isLocationAvailable = true
-        case .denied, .restricted:
-            isLocationAvailable = false
-        case .notDetermined:
-            break
-        @unknown default:
-            break
-        }
-    }
-    
-    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        self.latitude = location.coordinate.latitude
-        self.longitude = location.coordinate.longitude
-        self.isLocationAvailable = true
-        
-        // Reverse geocode to get human readable city
-        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
-            guard let self, let placemark = placemarks?.first else { return }
-            let city = placemark.locality ?? placemark.administrativeArea ?? "Current Location"
-            let country = placemark.country ?? ""
-            Task { @MainActor in
-                self.locationName = country.isEmpty ? city : "\(city), \(country)"
+    nonisolated public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
+        Task { @MainActor in
+            self.authorizationStatus = status
+            switch status {
+            case .authorizedWhenInUse, .authorizedAlways:
+                self.locationManager.requestLocation()
+                self.startHeadingUpdates()
+                self.isLocationAvailable = true
+            case .denied, .restricted:
+                self.isLocationAvailable = false
+            case .notDetermined:
+                break
+            @unknown default:
+                break
             }
         }
     }
     
-    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        // Fallback gracefully without crashing
-        isLocationAvailable = false
+    nonisolated public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        let lat = location.coordinate.latitude
+        let lon = location.coordinate.longitude
+        
+        Task { @MainActor in
+            self.latitude = lat
+            self.longitude = lon
+            self.isLocationAvailable = true
+            
+            self.geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
+                guard let self, let placemark = placemarks?.first else { return }
+                let city = placemark.locality ?? placemark.administrativeArea ?? "Current Location"
+                let country = placemark.country ?? ""
+                Task { @MainActor in
+                    self.locationName = country.isEmpty ? city : "\(city), \(country)"
+                }
+            }
+        }
     }
     
-    public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        // Prefer true heading if valid, otherwise fallback to magnetic heading
+    nonisolated public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        Task { @MainActor in
+            self.isLocationAvailable = false
+        }
+    }
+    
+    nonisolated public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         let heading = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
-        self.headingDegrees = heading
+        Task { @MainActor in
+            self.headingDegrees = heading
+        }
     }
 }

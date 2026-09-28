@@ -31,8 +31,8 @@ public final class AudioService: NSObject {
     
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
-    private var statusObservation: NSKeyValueObservation?
-    private var timeControlObservation: NSKeyValueObservation?
+    private nonisolated(unsafe) var statusObservation: NSKeyValueObservation?
+    private nonisolated(unsafe) var timeControlObservation: NSKeyValueObservation?
     
     public override init() {
         super.init()

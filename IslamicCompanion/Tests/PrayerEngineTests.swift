@@ -2,7 +2,7 @@ import XCTest
 @testable import IslamicCompanion
 
 final class PrayerEngineTests: XCTestCase {
-    var engine: PrayerEngine!
+    var engine = PrayerEngine()
 
     override func setUp() {
         super.setUp()

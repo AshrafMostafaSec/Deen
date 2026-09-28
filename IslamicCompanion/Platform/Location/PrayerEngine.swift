@@ -217,18 +217,26 @@ public struct PrayerEngine: Sendable {
     }
     
     private func calculateSolarAltitude(now: Date, latitude: Double, longitude: Double) -> Double {
+        let utcTimeZone = TimeZone(secondsFromGMT: 0) ?? .current
         let calendar = Calendar(identifier: .gregorian)
-        let comps = calendar.dateComponents(in: .utc, from: now)
-        let jd = julianDate(year: Double(comps.year ?? 2026), month: Double(comps.month ?? 3), day: Double(comps.day ?? 22))
+        let comps = calendar.dateComponents(in: utcTimeZone, from: now)
+        let yearVal = Double(comps.year ?? 2026)
+        let monthVal = Double(comps.month ?? 3)
+        let dayVal = Double(comps.day ?? 22)
+        let jd = julianDate(year: yearVal, month: monthVal, day: dayVal)
         let t = (jd - 2451545.0) / 36525.0
         let solar = solarCoordinates(t: t)
         
-        let utcHours = Double(comps.hour ?? 0) + Double(comps.minute ?? 0) / 60.0 + Double(comps.second ?? 0) / 3600.0
+        let hourVal = Double(comps.hour ?? 0)
+        let minVal = Double(comps.minute ?? 0) / 60.0
+        let secVal = Double(comps.second ?? 0) / 3600.0
+        let utcHours = hourVal + minVal + secVal
         let solarNoonUtc = 12.0 - (longitude / 15.0) - (solar.equationOfTime / 60.0)
         let hourAngleDeg = (utcHours - solarNoonUtc) * 15.0
         
-        let sinAlt = sin(latitude.toRadians()) * sin(solar.declination.toRadians())
-            + cos(latitude.toRadians()) * cos(solar.declination.toRadians()) * cos(hourAngleDeg.toRadians())
+        let term1 = sin(latitude.toRadians()) * sin(solar.declination.toRadians())
+        let term2 = cos(latitude.toRadians()) * cos(solar.declination.toRadians()) * cos(hourAngleDeg.toRadians())
+        let sinAlt = term1 + term2
             
         return asin(min(max(sinAlt, -1.0), 1.0)).toDegrees()
     }

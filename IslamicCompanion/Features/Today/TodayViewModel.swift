@@ -29,7 +29,7 @@ public final class TodayViewModel {
     public let dailyHadithSource: String = "Sahih Muslim"
     
     private let engine = PrayerEngine()
-    private var countdownTimer: Timer?
+    private nonisolated(unsafe) var countdownTimer: Timer?
     private var remainingSeconds: Int = 5174
     
     public init() {
