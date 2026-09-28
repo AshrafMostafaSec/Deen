@@ -44,6 +44,7 @@ public final class AudioService: NSObject {
     deinit {
         statusObservation?.invalidate()
         timeControlObservation?.invalidate()
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Public Playback API
@@ -246,56 +247,67 @@ public final class AudioService: NSObject {
     }
     
     private func setupNotifications() {
-        Task { @MainActor in
-            for await notification in NotificationCenter.default.notifications(named: AVAudioSession.interruptionNotification) {
-                self.handleInterruption(notification: notification)
-            }
-        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleInterruption),
+            name: AVAudioSession.interruptionNotification,
+            object: nil
+        )
         
-        Task { @MainActor in
-            for await notification in NotificationCenter.default.notifications(named: AVAudioSession.routeChangeNotification) {
-                self.handleRouteChange(notification: notification)
-            }
-        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleRouteChange),
+            name: AVAudioSession.routeChangeNotification,
+            object: nil
+        )
     }
     
-    private func handleInterruption(notification: Notification) {
+    nonisolated @objc private func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
         
-        switch type {
-        case .began:
-            player?.pause()
-            isPlaying = false
-            playbackState = .paused
-        case .ended:
-            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-                if options.contains(.shouldResume) {
-                    player?.play()
-                    isPlaying = true
-                    playbackState = .playing
+        let shouldResume: Bool
+        if type == .ended,
+           let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+            shouldResume = options.contains(.shouldResume)
+        } else {
+            shouldResume = false
+        }
+        
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            switch type {
+            case .began:
+                self.player?.pause()
+                self.isPlaying = false
+                self.playbackState = .paused
+            case .ended:
+                if shouldResume {
+                    self.player?.play()
+                    self.isPlaying = true
+                    self.playbackState = .playing
                 }
+            @unknown default:
+                break
             }
-        @unknown default:
-            break
         }
     }
     
-    private func handleRouteChange(notification: Notification) {
+    nonisolated @objc private func handleRouteChange(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }
         
-        switch reason {
-        case .oldDeviceUnavailable:
-            // Headphones unplugged or Bluetooth disconnected -> pause immediately!
-            player?.pause()
-            isPlaying = false
-            playbackState = .paused
-        default:
-            break
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            if reason == .oldDeviceUnavailable {
+                // Headphones unplugged or Bluetooth disconnected -> pause immediately!
+                self.player?.pause()
+                self.isPlaying = false
+                self.playbackState = .paused
+            }
         }
     }
 }

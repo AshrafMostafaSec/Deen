@@ -56,13 +56,15 @@ echo ""
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IPA_PATH="$SCRIPT_DIR/IslamicCompanion.ipa"
 
-echo -e "${YELLOW}[3/4] Checking App Package (IslamicCompanion.ipa)...${NC}"
-if [ ! -f "$IPA_PATH" ]; then
-    echo -e "${YELLOW}Downloading latest release from GitHub...${NC}"
-    gh release download v1.0.0 --pattern "*.ipa" --dir "$SCRIPT_DIR" --clobber
-fi
+echo -e "${YELLOW}[3/4] Fetching latest App Package (IslamicCompanion.ipa)...${NC}"
+echo -e "${YELLOW}Downloading latest release from GitHub...${NC}"
+gh release download v1.0.0 --pattern "*.ipa" --dir "$SCRIPT_DIR" --clobber || true
 
-echo -e "${GREEN}✓ Package ready at: ${CYAN}$IPA_PATH${NC} ($(ls -lh "$IPA_PATH" | awk '{print $5}'))"
+if [ -f "$IPA_PATH" ]; then
+    echo -e "${GREEN}✓ Package ready at: ${CYAN}$IPA_PATH${NC} ($(ls -lh "$IPA_PATH" | awk '{print $5}'))"
+else
+    echo -e "${RED}⚠️ Could not download latest IPA automatically.${NC}"
+fi
 echo ""
 
 # 5. Launch Native iLoader Tool

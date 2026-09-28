@@ -28,7 +28,7 @@ targets:
       path: IslamicCompanion/App/Info.plist
       properties:
         CFBundleDisplayName: "Deen"
-        CFBundleIdentifier: "com.deen.companion"
+        CFBundleIdentifier: "com.deen.IslamicCompanion"
         CFBundleShortVersionString: "1.0.0"
         CFBundleVersion: "1"
         UILaunchScreen:
