@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct QuranHomeView: View {
     @State private var viewModel = QuranViewModel()
+    @State private var selectedSurahForReading: SurahMetadata? = nil
     
     public init() {}
     
@@ -28,6 +29,9 @@ public struct QuranHomeView: View {
             .padding(.bottom, 120)
         }
         .background(AppColor.background.ignoresSafeArea())
+        .sheet(item: $selectedSurahForReading) { surah in
+            QuranReaderView(surah: surah)
+        }
     }
     
     // MARK: - Sections
@@ -132,7 +136,7 @@ public struct QuranHomeView: View {
                 Spacer()
                 
                 Button {
-                    // Open reader
+                    selectedSurahForReading = viewModel.filteredSurahs.first(where: { $0.number == 2 }) ?? viewModel.filteredSurahs.first
                 } label: {
                     HStack(spacing: 5) {
                         Image(systemName: "book.fill")
@@ -251,57 +255,62 @@ public struct QuranHomeView: View {
             
             LazyVStack(spacing: 8) {
                 ForEach(viewModel.filteredSurahs) { surah in
-                    HStack(spacing: AppSpacing.spaceMd) {
-                        // Number plate
-                        ZStack {
-                            Circle()
-                                .fill(AppColor.surfaceContainerHighest)
-                                .frame(width: 36, height: 36)
-                            Text("\(surah.number)")
-                                .font(AppFont.technicalMetric(size: 13, weight: .semibold))
-                                .foregroundColor(AppColor.primary)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(surah.nameEnglish)
-                                .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
-                                .foregroundColor(AppColor.onSurface)
-                            
-                            HStack(spacing: 4) {
-                                Text("\(surah.totalAyahs) Ayahs")
-                                    .font(AppFont.interface(size: 11))
-                                Text("•")
-                                    .font(.system(size: 8))
-                                Text(surah.revelationType.rawValue)
-                                    .font(AppFont.interface(size: 11))
-                                Text("•")
-                                    .font(.system(size: 8))
-                                Text("Page \(surah.startPage)")
-                                    .font(AppFont.interface(size: 11))
+                    Button {
+                        selectedSurahForReading = surah
+                    } label: {
+                        HStack(spacing: AppSpacing.spaceMd) {
+                            // Number plate
+                            ZStack {
+                                Circle()
+                                    .fill(AppColor.surfaceContainerHighest)
+                                    .frame(width: 36, height: 36)
+                                Text("\(surah.number)")
+                                    .font(AppFont.technicalMetric(size: 13, weight: .semibold))
+                                    .foregroundColor(AppColor.primary)
                             }
-                            .foregroundColor(AppColor.onSurfaceVariant)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(surah.nameEnglish)
+                                    .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
+                                    .foregroundColor(AppColor.onSurface)
+                                
+                                HStack(spacing: 4) {
+                                    Text("\(surah.totalAyahs) Ayahs")
+                                        .font(AppFont.interface(size: 11))
+                                    Text("•")
+                                        .font(.system(size: 8))
+                                    Text(surah.revelationType.rawValue)
+                                        .font(AppFont.interface(size: 11))
+                                    Text("•")
+                                        .font(.system(size: 8))
+                                    Text("Page \(surah.startPage)")
+                                        .font(AppFont.interface(size: 11))
+                                }
+                                .foregroundColor(AppColor.onSurfaceVariant)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(surah.nameArabic)
+                                .font(AppFont.quranScripture(size: 19))
+                                .foregroundColor(AppColor.secondary)
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(AppColor.outline)
                         }
-                        
-                        Spacer()
-                        
-                        Text(surah.nameArabic)
-                            .font(AppFont.quranScripture(size: 19))
-                            .foregroundColor(AppColor.secondary)
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(AppColor.outline)
+                        .padding(.horizontal, AppSpacing.spaceMd)
+                        .padding(.vertical, 12)
+                        .background {
+                            RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                                .fill(AppColor.surfaceContainerLow)
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                                .strokeBorder(AppColor.hairlineBorder, lineWidth: 1)
+                        }
                     }
-                    .padding(.horizontal, AppSpacing.spaceMd)
-                    .padding(.vertical, 12)
-                    .background {
-                        RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
-                            .fill(AppColor.surfaceContainerLow)
-                    }
-                    .overlay {
-                        RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
-                            .strokeBorder(AppColor.hairlineBorder, lineWidth: 1)
-                    }
+                    .buttonStyle(.plain)
                 }
             }
         }

@@ -42,6 +42,7 @@ public final class TodayViewModel {
         self.remainingSeconds = prayerSchedule.nextPrayerCountdownSeconds
         updateCountdownString()
         startTimer()
+        updateRemindersAndQiyam()
     }
     
     public func updateLocation(latitude: Double, longitude: Double, name: String) {
@@ -54,10 +55,25 @@ public final class TodayViewModel {
         )
         self.remainingSeconds = prayerSchedule.nextPrayerCountdownSeconds
         updateCountdownString()
+        updateRemindersAndQiyam()
     }
     
     public func toggleQiyamAlarm() {
         isQiyamAlarmEnabled.toggle()
+        updateRemindersAndQiyam()
+    }
+    
+    private func updateRemindersAndQiyam() {
+        NotificationService.shared.schedulePrayerReminders(schedule: prayerSchedule)
+        if let maghrib = prayerSchedule.times.first(where: { $0.kind == .maghrib })?.date,
+           let fajr = prayerSchedule.times.first(where: { $0.kind == .fajr })?.date {
+            let nextFajr = fajr > maghrib ? fajr : fajr.addingTimeInterval(86400)
+            let qiyam = engine.calculateQiyam(sunset: maghrib, fajrNextDay: nextFajr)
+            self.qiyamTimeString = qiyam.formattedLastThird
+            if isQiyamAlarmEnabled {
+                NotificationService.shared.scheduleQiyamReminder(qiyamDate: qiyam.lastThirdStart)
+            }
+        }
     }
     
     private func startTimer() {
