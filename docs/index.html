@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deen — الرفيق الإسلامي اليومي لنظام iOS</title>
+  <meta name="description" content="تطبيق إسلامي فائق الجودة لهواتف iPhone، مستوحى من لغة تصميم Aetherial Astrolabe. القرآن الكريم، مواقيت الصلاة الفلكية، القبلة، الأذكار، وراديو مصر المباشر.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#111413',
+              surface: '#151A18',
+              card: '#1D201F',
+              primary: '#9DD2B3',
+              primaryContainer: '#2A5C43',
+              secondary: '#B3CCBF',
+              tertiary: '#E0C298',
+              outline: '#8A938C'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            space: ['"Space Grotesk"', 'monospace'],
+            amiri: ['"Amiri"', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #111413;
+      color: #E1E3E1;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .astrolabe-glass {
+      background: rgba(29, 32, 31, 0.72);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+    .emerald-glow {
+      box-shadow: 0 0 35px rgba(42, 92, 67, 0.45);
+    }
+    .radial-bg {
+      background: radial-gradient(circle at 50% 10%, rgba(42, 92, 67, 0.25) 0%, rgba(17, 20, 19, 0) 70%);
+    }
+  </style>
+</head>
+<body class="radial-bg min-h-screen flex flex-col justify-between selection:bg-brand-primaryContainer selection:text-brand-primary">
+
+  <!-- Navigation -->
+  <header class="sticky top-0 z-50 astrolabe-glass border-b border-white/5 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-brand-primaryContainer flex items-center justify-center text-brand-primary font-bold text-xl shadow-lg border border-brand-primary/30">
+          ☪
+        </div>
+        <div>
+          <span class="font-bold text-lg text-white tracking-wide">Deen</span>
+          <span class="text-xs text-brand-tertiary block font-amiri">الرفيق الإسلامي اليومي</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <a href="#install" class="hidden md:inline-block text-sm font-medium text-brand-secondary hover:text-white transition">طريقة التثبيت</a>
+        <a href="#screens" class="hidden md:inline-block text-sm font-medium text-brand-secondary hover:text-white transition">الشاشات</a>
+        <a href="#radio" class="hidden md:inline-block text-sm font-medium text-brand-secondary hover:text-white transition">الراديو المباشر</a>
+        <a href="https://github.com/AshrafMostafaSec/Deen/releases/latest/download/IslamicCompanion.ipa" class="px-5 py-2.5 rounded-full bg-brand-primary text-black font-semibold text-sm hover:scale-105 active:scale-95 transition shadow-lg flex items-center gap-2">
+          <span>تحميل الـ IPA</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-6xl mx-auto px-6 pt-16 pb-24">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-primaryContainer/60 border border-brand-primary/30 text-brand-primary text-xs font-semibold mb-6">
+        <span class="w-2 h-2 rounded-full bg-brand-primary animate-ping"></span>
+        <span>تطبيق هاتف iPhone • معمارية Apple Native 100%</span>
+      </div>
+      
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6 leading-tight">
+        السكينة اليومية، والدقة الفلكية <br>
+        <span class="text-brand-primary">في تطبيق واحد فائق الجمال</span>
+      </h1>
+      
+      <p class="text-lg text-brand-secondary mb-10 leading-relaxed font-normal">
+        تطبيق إسلامي مصمم بعناية متناهية مستوحى من لغة <strong>Aetherial Astrolabe</strong>. يجمع بين حسابات مدار الشمس الفلكية، تلاوة القرآن الكريم، الأذكار التفاعلية، بث إذاعة القرآن الكريم من القاهرة، مع صفر إعلانات وصفر تتبع للخصوصية.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="https://github.com/AshrafMostafaSec/Deen/releases/latest/download/IslamicCompanion.ipa" class="px-8 py-4 rounded-full bg-brand-primary text-black font-bold text-base hover:scale-105 active:scale-95 transition shadow-2xl emerald-glow flex items-center gap-3">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.77 1.06-1.85.94-2.93-.93.04-2.07.63-2.73 1.4-.59.67-1.11 1.76-.97 2.82 1.05.08 2.13-.53 2.76-1.29z"/></svg>
+          <span>تحميل حزمة التطبيق (Deen.ipa)</span>
+        </a>
+        <a href="https://github.com/AshrafMostafaSec/Deen" target="_blank" class="px-6 py-4 rounded-full bg-brand-card hover:bg-white/10 text-white font-semibold text-base transition border border-white/10 flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>مستودع الكود على GitHub</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Live Screenshots Gallery -->
+    <section id="screens" class="mb-24">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-white mb-3">واجهات التطبيق الأربعة الأصلية</h2>
+        <p class="text-brand-secondary text-sm">تصميم الأسطرلاب الأثيري عالي الدقة (OLED Optimized)</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Screen 1 -->
+        <div class="astrolabe-glass rounded-3xl p-4 flex flex-col items-center hover:scale-[1.02] transition duration-300">
+          <div class="overflow-hidden rounded-2xl mb-4 border border-white/10 shadow-2xl">
+            <img src="images/screen_today.png" alt="Today Screen" class="w-full h-auto object-cover">
+          </div>
+          <span class="font-bold text-white text-base">١. اليوم (Today)</span>
+          <span class="text-xs text-brand-secondary text-center mt-1">العداد الفلكي التنازلي ومسار الشمس</span>
+        </div>
+
+        <!-- Screen 2 -->
+        <div class="astrolabe-glass rounded-3xl p-4 flex flex-col items-center hover:scale-[1.02] transition duration-300">
+          <div class="overflow-hidden rounded-2xl mb-4 border border-white/10 shadow-2xl">
+            <img src="images/screen_quran.png" alt="Quran Screen" class="w-full h-auto object-cover">
+          </div>
+          <span class="font-bold text-white text-base">٢. القرآن (Quran)</span>
+          <span class="text-xs text-brand-secondary text-center mt-1">مصحف المدينة ورسم المصحف العثماني</span>
+        </div>
+
+        <!-- Screen 3 -->
+        <div class="astrolabe-glass rounded-3xl p-4 flex flex-col items-center hover:scale-[1.02] transition duration-300">
+          <div class="overflow-hidden rounded-2xl mb-4 border border-white/10 shadow-2xl">
+            <img src="images/screen_prayer.png" alt="Prayer Screen" class="w-full h-auto object-cover">
+          </div>
+          <span class="font-bold text-white text-base">٣. الصلاة (Prayer)</span>
+          <span class="text-xs text-brand-secondary text-center mt-1">سجل التتبع وبوصلة القبلة الفلكية</span>
+        </div>
+
+        <!-- Screen 4 -->
+        <div class="astrolabe-glass rounded-3xl p-4 flex flex-col items-center hover:scale-[1.02] transition duration-300">
+          <div class="overflow-hidden rounded-2xl mb-4 border border-white/10 shadow-2xl">
+            <img src="images/screen_adhkar.png" alt="Adhkar Screen" class="w-full h-auto object-cover">
+          </div>
+          <span class="font-bold text-white text-base">٤. الأذكار (Adhkar)</span>
+          <span class="text-xs text-brand-secondary text-center mt-1">مسبحة الذكر المركز مع الاهتزاز اللمسي</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Radio Demo Player -->
+    <section id="radio" class="mb-24 astrolabe-glass rounded-3xl p-8 max-w-3xl mx-auto border border-brand-primary/20">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <span class="text-xs font-bold text-red-400 bg-red-950/60 px-3 py-1 rounded-full border border-red-800">بث حي مباشر</span>
+          <h3 class="text-2xl font-bold text-white mt-2">راديو إذاعة القرآن الكريم من القاهرة</h3>
+          <p class="text-xs text-brand-secondary">استمع للبث المباشر الآن مباشرة من متصفحك أو عبر التطبيق</p>
+        </div>
+        <div class="w-12 h-12 rounded-full bg-brand-primaryContainer flex items-center justify-center text-brand-primary text-2xl animate-pulse">
+          📻
+        </div>
+      </div>
+
+      <audio controls class="w-full rounded-2xl filter invert brightness-90">
+        <source src="https://backup.qurango.net/radio/cairo" type="audio/mpeg">
+        متصفحك لا يدعم مشغل الصوت.
+      </audio>
+    </section>
+
+    <!-- Installation Steps Guide for iPhone Users -->
+    <section id="install" class="max-w-3xl mx-auto mb-20">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-white mb-3">طريقة تثبيت التطبيق على هاتف iPhone</h2>
+        <p class="text-brand-secondary text-sm">مجاناً وبدون الحاجة لحساب مطور Apple مدفوع</p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="astrolabe-glass rounded-2xl p-6">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-brand-primary text-black font-bold flex items-center justify-center text-lg">١</div>
+            <div>
+              <h4 class="font-bold text-white text-base">تحميل ملف الحزمة (Deen.ipa)</h4>
+              <p class="text-sm text-brand-secondary mt-1">قم بتحميل ملف الـ IPA مباشرة إلى هاتفك من زر التحميل بالأعلى أو من صفحة الـ Releases على GitHub.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="astrolabe-glass rounded-2xl p-6">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-brand-primary text-black font-bold flex items-center justify-center text-lg">٢</div>
+            <div>
+              <h4 class="font-bold text-white text-base">التثبيت عبر SideStore أو AltStore (موصى به)</h4>
+              <p class="text-sm text-brand-secondary mt-1">افتح تطبيق <strong>SideStore</strong> أو <strong>AltStore</strong> على هاتفك، اضغط على زر (+)، واختر ملف <code class="text-brand-primary">IslamicCompanion.ipa</code> ليتم توقيعه بحساب Apple ID الشخصي مجاناً.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="astrolabe-glass rounded-2xl p-6">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-brand-primary text-black font-bold flex items-center justify-center text-lg">٣</div>
+            <div>
+              <h4 class="font-bold text-white text-base">التثبيت عبر Sideloadly (من الكمبيوتر)</h4>
+              <p class="text-sm text-brand-secondary mt-1">إذا كنت تفضل تثبيته عبر كابل الـ USB، افتح برنامج Sideloadly على حاسوبك واسحب ملف الـ IPA واضغط Start.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-8 text-center text-xs text-brand-secondary">
+    <p>تطبيق Deen • مرخص ومفتوح المصدر بالكامل • معمارية Swift 6 و SwiftUI الأصلية</p>
+  </footer>
+
+</body>
+</html>

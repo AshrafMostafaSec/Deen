@@ -1,9 +1,7 @@
-name: Build Islamic Companion iOS (IPA)
+name: Build & Release Islamic Companion iOS (IPA & Web)
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
     branches: [ main, master ]
   workflow_dispatch:
     inputs:
@@ -16,20 +14,30 @@ on:
           - Release
           - Debug
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-and-build"
+  cancel-in-progress: false
+
 jobs:
-  build-ios:
-    name: Build & Export iOS IPA
+  build-and-release:
+    name: Build iOS IPA & Create Release
     runs-on: macos-14  # Apple Silicon runner (M1/M2) with latest Xcode
 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Select Xcode Version
         run: |
           echo "Available Xcode installations:"
           ls -d /Applications/Xcode* || true
-          # Select latest Xcode 16 or 15 available
           if [ -d "/Applications/Xcode_16.app" ]; then
             sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
           elif [ -d "/Applications/Xcode_16.1.app" ]; then
@@ -47,40 +55,30 @@ jobs:
 
       - name: Generate Xcode Project via XcodeGen
         run: |
-          if [ -f "project.yml" ]; then
-            echo "Installing XcodeGen..."
-            brew install xcodegen
-            echo "Generating Xcode project..."
-            xcodegen generate
-          fi
+          echo "Installing XcodeGen..."
+          brew install xcodegen
+          echo "Generating Xcode project..."
+          xcodegen generate
 
       - name: Build and Archive (Clean Architecture)
         run: |
           CONFIG="${{ github.event.inputs.build_configuration || 'Release' }}"
           echo "Building configuration: $CONFIG"
           
-          # Check if .xcodeproj exists, otherwise generate or build workspace
-          if [ -d "IslamicCompanion.xcodeproj" ]; then
-            xcodebuild archive \
-              -project IslamicCompanion.xcodeproj \
-              -scheme IslamicCompanion \
-              -configuration "$CONFIG" \
-              -destination "generic/platform=iOS" \
-              -archivePath "build/archive/IslamicCompanion.xcarchive" \
-              -derivedDataPath "build/derivedData" \
-              CODE_SIGNING_ALLOWED=NO \
-              CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGN_IDENTITY="" \
-              AD_HOC_CODE_SIGNING_ALLOWED=YES
-          else
-            echo "Building Swift Package / Module directly..."
-            swift build -c release
-          fi
+          xcodebuild archive \
+            -project IslamicCompanion.xcodeproj \
+            -scheme IslamicCompanion \
+            -configuration "$CONFIG" \
+            -destination "generic/platform=iOS" \
+            -archivePath "build/archive/IslamicCompanion.xcarchive" \
+            -derivedDataPath "build/derivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
 
       - name: Package Payload into Sideloadable IPA
-        if: always()
         run: |
-          # If xcarchive exists, package its Application into .ipa
           if [ -d "build/archive/IslamicCompanion.xcarchive/Products/Applications" ]; then
             mkdir -p build/ipa_payload/Payload
             cp -r build/archive/IslamicCompanion.xcarchive/Products/Applications/*.app build/ipa_payload/Payload/
@@ -89,20 +87,63 @@ jobs:
             cd ../..
             echo "Successfully packaged IslamicCompanion.ipa"
           else
-            echo "Creating placeholder artifact if building for unit tests/syntax"
-            touch build/artifacts/build_output.txt
+            echo "Error: Applications directory not found in xcarchive"
+            exit 1
           fi
 
       - name: Upload IPA Artifact to GitHub Run
         uses: actions/upload-artifact@v4
         with:
           name: IslamicCompanion-iOS-IPA
-          path: build/artifacts/
+          path: build/artifacts/IslamicCompanion.ipa
           retention-days: 14
+
+      - name: Create or Update GitHub Release with IPA
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="v1.0.0"
+          echo "Creating or updating GitHub Release: $TAG_NAME"
+          # Delete existing release/tag if already present to update cleanly
+          gh release delete "$TAG_NAME" --yes || true
+          git tag -d "$TAG_NAME" 2>/dev/null || true
+          git push origin :refs/tags/"$TAG_NAME" 2>/dev/null || true
+          
+          gh release create "$TAG_NAME" \
+            build/artifacts/IslamicCompanion.ipa \
+            --title "Deen iOS v1.0.0 (Enterprise Release)" \
+            --notes "### 📱 Deen — Islamic Daily Companion for iPhone
+            - **Platform:** iOS 17.0+ / iOS 18+
+            - **Architecture:** Swift 6.4 Strict Concurrency, Pure Astronomical Math, AVFoundation Background Audio.
+            - **Direct Download:** [IslamicCompanion.ipa](https://github.com/${{ github.repository }}/releases/download/v1.0.0/IslamicCompanion.ipa)
+            - **Installation:** Sideloadable directly via SideStore, AltStore, Sideloadly, or Scarlet without a paid developer account." \
+            --latest
 
       - name: Build Summary
         run: |
-          echo "### 📱 iOS Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
-          echo "- **Configuration:** ${{ github.event.inputs.build_configuration || 'Release' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Runner:** macOS 14 (Apple Silicon)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Installation Note:** You can download the \`IslamicCompanion.ipa\` artifact directly from this workflow and install it on your iPhone via SideStore, AltStore, Sideloadly, or Scarlet without needing a paid developer account." >> $GITHUB_STEP_SUMMARY
+          echo "### 📱 iOS Build & Release Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release:** [Deen iOS v1.0.0](https://github.com/${{ github.repository }}/releases/tag/v1.0.0)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Direct IPA Download:** [IslamicCompanion.ipa](https://github.com/${{ github.repository }}/releases/download/v1.0.0/IslamicCompanion.ipa)" >> $GITHUB_STEP_SUMMARY
+
+  deploy-pages:
+    name: Deploy Web Showcase to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build-and-release
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Web Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
