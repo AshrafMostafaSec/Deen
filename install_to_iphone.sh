@@ -91,4 +91,5 @@ echo -e " • إذا طلب منك Developer Mode: اذهب إلى ${YELLOW}ال
 echo ""
 echo -e "${GREEN}جاري تشغيل iLoader الآن...${NC}"
 
-exec "$ILOADER_BIN"
+cd "$SCRIPT_DIR/tools/squashfs-root/usr"
+exec ./bin/iloader "$@"
