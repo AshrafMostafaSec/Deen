@@ -43,9 +43,6 @@ targets:
         ITSAppUsesNonExemptEncryption: false
     entitlements:
       path: IslamicCompanion/App/IslamicCompanion.entitlements
-      properties:
-        com.apple.security.application-groups:
-          - group.com.deen.companion
 
   IslamicCompanionTests:
     type: bundle.unit-test

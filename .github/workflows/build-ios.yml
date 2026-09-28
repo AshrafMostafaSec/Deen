@@ -82,6 +82,10 @@ jobs:
           if [ -d "build/archive/IslamicCompanion.xcarchive/Products/Applications" ]; then
             mkdir -p build/ipa_payload/Payload
             cp -r build/archive/IslamicCompanion.xcarchive/Products/Applications/*.app build/ipa_payload/Payload/
+            
+            echo "Applying Ad-Hoc signature to app bundle..."
+            codesign -s - --force --deep build/ipa_payload/Payload/*.app
+            
             cd build/ipa_payload
             zip -r -q ../artifacts/IslamicCompanion.ipa Payload
             cd ../..
