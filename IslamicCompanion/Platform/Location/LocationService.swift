@@ -13,7 +13,6 @@ public final class LocationService: NSObject, CLLocationManagerDelegate {
     public private(set) var isLocationAvailable: Bool = false
     
     private let locationManager = CLLocationManager()
-    private let geocoder = CLGeocoder()
     
     public override init() {
         super.init()
@@ -69,11 +68,13 @@ public final class LocationService: NSObject, CLLocationManagerDelegate {
             self.longitude = lon
             self.isLocationAvailable = true
             
-            if let placemarks = try? await self.geocoder.reverseGeocodeLocation(location),
-               let placemark = placemarks.first {
+            CLGeocoder().reverseGeocodeLocation(location) { placemarks, _ in
+                guard let placemark = placemarks?.first else { return }
                 let city = placemark.locality ?? placemark.administrativeArea ?? "Current Location"
                 let country = placemark.country ?? ""
-                self.locationName = country.isEmpty ? city : "\(city), \(country)"
+                Task { @MainActor [weak self] in
+                    self?.locationName = country.isEmpty ? city : "\(city), \(country)"
+                }
             }
         }
     }
