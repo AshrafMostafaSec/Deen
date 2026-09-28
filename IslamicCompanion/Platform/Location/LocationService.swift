@@ -40,11 +40,12 @@ public final class LocationService: NSObject, CLLocationManagerDelegate {
     
     nonisolated public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
+            guard let self else { return }
             self.authorizationStatus = status
             switch status {
             case .authorizedWhenInUse, .authorizedAlways:
-                self.locationManager.requestLocation()
+                self.locationManager.startUpdatingLocation()
                 self.startHeadingUpdates()
                 self.isLocationAvailable = true
             case .denied, .restricted:
@@ -62,32 +63,33 @@ public final class LocationService: NSObject, CLLocationManagerDelegate {
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
         
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
+            guard let self else { return }
             self.latitude = lat
             self.longitude = lon
             self.isLocationAvailable = true
             
-            self.geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
-                guard let self, let placemark = placemarks?.first else { return }
+            self.geocoder.reverseGeocodeLocation(location) { placemarks, _ in
+                guard let placemark = placemarks?.first else { return }
                 let city = placemark.locality ?? placemark.administrativeArea ?? "Current Location"
                 let country = placemark.country ?? ""
-                Task { @MainActor in
-                    self.locationName = country.isEmpty ? city : "\(city), \(country)"
+                Task { @MainActor [weak self] in
+                    self?.locationName = country.isEmpty ? city : "\(city), \(country)"
                 }
             }
         }
     }
     
     nonisolated public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        Task { @MainActor in
-            self.isLocationAvailable = false
+        Task { @MainActor [weak self] in
+            self?.isLocationAvailable = false
         }
     }
     
     nonisolated public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         let heading = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
-        Task { @MainActor in
-            self.headingDegrees = heading
+        Task { @MainActor [weak self] in
+            self?.headingDegrees = heading
         }
     }
 }

@@ -1,8 +1,8 @@
 import Foundation
 import UserNotifications
 
-@MainActor
-public final class NotificationService {
+/// Thread-safe, non-blocking notification scheduler for Adhan, Qiyam, and Adhkar
+public final class NotificationService: Sendable {
     public static let shared = NotificationService()
     
     public init() {}

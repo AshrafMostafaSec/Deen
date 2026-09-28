@@ -45,6 +45,12 @@ public struct TodayView: View {
             .padding(.bottom, 120) // Space for floating mini-player & tab bar
         }
         .background(AppColor.background.ignoresSafeArea())
+        .onAppear {
+            viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
     }
     
     // MARK: - Sections

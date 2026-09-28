@@ -1,0 +1,157 @@
+{
+  "morning": [
+    {
+      "id": "m1",
+      "textArabic": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "textEnglish": "We have entered a new morning and with it all dominion belongs to Allah. Praise is to Allah. None has the right to be worshipped except Allah alone, without partner.",
+      "targetCount": 1,
+      "reference": "Sahih Muslim"
+    },
+    {
+      "id": "m2",
+      "textArabic": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
+      "textEnglish": "O Allah, by You we enter the morning and by You we enter the evening, by You we live and by You we die, and to You is the resurrection.",
+      "targetCount": 1,
+      "reference": "At-Tirmidhi"
+    },
+    {
+      "id": "m3",
+      "textArabic": "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ",
+      "textEnglish": "Sayyid al-Istighfar (The Master Supplication for Forgiveness): O Allah, You are my Lord, none has the right to be worshipped but You. You created me and I am Your servant...",
+      "targetCount": 1,
+      "reference": "Sahih al-Bukhari"
+    },
+    {
+      "id": "m4",
+      "textArabic": "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+      "textEnglish": "In the name of Allah, with whose name nothing on earth or in the sky can cause harm, and He is the All-Hearing, All-Knowing.",
+      "targetCount": 3,
+      "reference": "Abu Dawood & At-Tirmidhi"
+    },
+    {
+      "id": "m5",
+      "textArabic": "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا",
+      "textEnglish": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad (pbuh) as my Prophet.",
+      "targetCount": 3,
+      "reference": "Abu Dawood & Ahmad"
+    },
+    {
+      "id": "m6",
+      "textArabic": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+      "textEnglish": "O Ever Living One, O Self-Existing One, by Your mercy I seek assistance. Rectify for me all my affairs, and do not leave me to myself even for the blink of an eye.",
+      "targetCount": 1,
+      "reference": "Al-Hakim"
+    },
+    {
+      "id": "m7",
+      "textArabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "textEnglish": "Glory is to Allah and praise is to Him. (Whoever says this 100 times in the morning and evening, his sins will be forgiven even if they are like the foam of the sea).",
+      "targetCount": 100,
+      "reference": "Sahih Muslim"
+    }
+  ],
+  "evening": [
+    {
+      "id": "e1",
+      "textArabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "textEnglish": "We have entered the evening and with it all dominion belongs to Allah. Praise is to Allah. None has the right to be worshipped except Allah alone.",
+      "targetCount": 1,
+      "reference": "Sahih Muslim"
+    },
+    {
+      "id": "e2",
+      "textArabic": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
+      "textEnglish": "O Allah, by You we enter the evening and by You we enter the morning, by You we live and by You we die, and to You is the final return.",
+      "targetCount": 1,
+      "reference": "At-Tirmidhi"
+    },
+    {
+      "id": "e3",
+      "textArabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+      "textEnglish": "I seek refuge in the perfect words of Allah from the evil of what He has created.",
+      "targetCount": 3,
+      "reference": "Sahih Muslim"
+    },
+    {
+      "id": "e4",
+      "textArabic": "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+      "textEnglish": "In the name of Allah, with whose name nothing on earth or in the sky can cause harm.",
+      "targetCount": 3,
+      "reference": "Abu Dawood"
+    },
+    {
+      "id": "e5",
+      "textArabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "textEnglish": "Glory is to Allah and praise is to Him (100 times).",
+      "targetCount": 100,
+      "reference": "Sahih Muslim"
+    }
+  ],
+  "post_prayer": [
+    {
+      "id": "p1",
+      "textArabic": "أَسْتَغْفِرُ اللَّهَ ، أَسْتَغْفِرُ اللَّهَ ، أَسْتَغْفِرُ اللَّهَ",
+      "textEnglish": "I seek forgiveness from Allah (3 times).",
+      "targetCount": 3,
+      "reference": "Sahih Muslim"
+    },
+    {
+      "id": "p2",
+      "textArabic": "اللَّهُمَّ أَنْتَ السَّلاَمُ وَمِنْكَ السَّلاَمُ تَبَارَكْتَ يَا ذَا الْجَلاَلِ وَالإِكْرَامِ",
+      "textEnglish": "O Allah, You are Peace and from You comes peace. Blessed are You, O Possessor of majesty and honor.",
+      "targetCount": 1,
+      "reference": "Sahih Muslim"
+    },
+    {
+      "id": "p3",
+      "textArabic": "سُبْحَانَ اللَّهِ",
+      "textEnglish": "Glory be to Allah (33 times).",
+      "targetCount": 33,
+      "reference": "Sahih al-Bukhari"
+    },
+    {
+      "id": "p4",
+      "textArabic": "الْحَمْدُ لِلَّهِ",
+      "textEnglish": "Praise be to Allah (33 times).",
+      "targetCount": 33,
+      "reference": "Sahih al-Bukhari"
+    },
+    {
+      "id": "p5",
+      "textArabic": "اللَّهُ أَكْبَرُ",
+      "textEnglish": "Allah is Most Great (33 times).",
+      "targetCount": 33,
+      "reference": "Sahih al-Bukhari"
+    },
+    {
+      "id": "p6",
+      "textArabic": "لاَ إِلَـهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "textEnglish": "None has the right to be worshipped except Allah alone, without partner (To complete the hundred).",
+      "targetCount": 1,
+      "reference": "Sahih Muslim"
+    }
+  ],
+  "sleep": [
+    {
+      "id": "s1",
+      "textArabic": "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي وَبِكَ أَرْفَعُهُ، إِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ",
+      "textEnglish": "In Your name my Lord, I lie down and in Your name I arise. If You keep my soul, have mercy upon it, and if You send it back, protect it as You protect Your righteous slaves.",
+      "targetCount": 1,
+      "reference": "Sahih al-Bukhari"
+    },
+    {
+      "id": "s2",
+      "textArabic": "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
+      "textEnglish": "O Allah, in Your name I die and I live.",
+      "targetCount": 1,
+      "reference": "Sahih al-Bukhari"
+    },
+    {
+      "id": "s3",
+      "textArabic": "سُبْحَانَ اللَّهِ (33) ، وَالْحَمْدُ لِلَّهِ (33) ، وَاللَّهُ أَكْبَرُ (34)",
+      "textEnglish": "The Tasbeeh of Fatimah: SubhanAllah (33), Alhamdulillah (33), Allahu Akbar (34).",
+      "targetCount": 1,
+      "reference": "Sahih al-Bukhari"
+    }
+  ]
+}

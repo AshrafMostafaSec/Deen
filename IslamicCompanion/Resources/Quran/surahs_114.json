@@ -1,0 +1,1142 @@
+[
+  {
+    "number": 1,
+    "nameArabic": "الفاتحة",
+    "nameEnglish": "Al-Fatihah",
+    "englishTranslation": "The Opening",
+    "totalAyahs": 7,
+    "revelationType": "Makki",
+    "startPage": 1,
+    "juzNumber": 1
+  },
+  {
+    "number": 2,
+    "nameArabic": "البقرة",
+    "nameEnglish": "Al-Baqarah",
+    "englishTranslation": "The Cow",
+    "totalAyahs": 286,
+    "revelationType": "Madani",
+    "startPage": 2,
+    "juzNumber": 1
+  },
+  {
+    "number": 3,
+    "nameArabic": "آل عمران",
+    "nameEnglish": "Ali 'Imran",
+    "englishTranslation": "Family of Imran",
+    "totalAyahs": 200,
+    "revelationType": "Madani",
+    "startPage": 50,
+    "juzNumber": 3
+  },
+  {
+    "number": 4,
+    "nameArabic": "النساء",
+    "nameEnglish": "An-Nisa",
+    "englishTranslation": "The Women",
+    "totalAyahs": 176,
+    "revelationType": "Madani",
+    "startPage": 77,
+    "juzNumber": 4
+  },
+  {
+    "number": 5,
+    "nameArabic": "المائدة",
+    "nameEnglish": "Al-Ma'idah",
+    "englishTranslation": "The Table Spread",
+    "totalAyahs": 120,
+    "revelationType": "Madani",
+    "startPage": 106,
+    "juzNumber": 6
+  },
+  {
+    "number": 6,
+    "nameArabic": "الأنعام",
+    "nameEnglish": "Al-An'am",
+    "englishTranslation": "The Cattle",
+    "totalAyahs": 165,
+    "revelationType": "Makki",
+    "startPage": 128,
+    "juzNumber": 7
+  },
+  {
+    "number": 7,
+    "nameArabic": "الأعراف",
+    "nameEnglish": "Al-A'raf",
+    "englishTranslation": "The Heights",
+    "totalAyahs": 206,
+    "revelationType": "Makki",
+    "startPage": 151,
+    "juzNumber": 8
+  },
+  {
+    "number": 8,
+    "nameArabic": "الأنفال",
+    "nameEnglish": "Al-Anfal",
+    "englishTranslation": "The Spoils of War",
+    "totalAyahs": 75,
+    "revelationType": "Madani",
+    "startPage": 177,
+    "juzNumber": 9
+  },
+  {
+    "number": 9,
+    "nameArabic": "التوبة",
+    "nameEnglish": "At-Tawbah",
+    "englishTranslation": "The Repentance",
+    "totalAyahs": 129,
+    "revelationType": "Madani",
+    "startPage": 187,
+    "juzNumber": 10
+  },
+  {
+    "number": 10,
+    "nameArabic": "يونس",
+    "nameEnglish": "Yunus",
+    "englishTranslation": "Jonah",
+    "totalAyahs": 109,
+    "revelationType": "Makki",
+    "startPage": 208,
+    "juzNumber": 11
+  },
+  {
+    "number": 11,
+    "nameArabic": "هود",
+    "nameEnglish": "Hud",
+    "englishTranslation": "Hud",
+    "totalAyahs": 123,
+    "revelationType": "Makki",
+    "startPage": 221,
+    "juzNumber": 11
+  },
+  {
+    "number": 12,
+    "nameArabic": "يوسف",
+    "nameEnglish": "Yusuf",
+    "englishTranslation": "Joseph",
+    "totalAyahs": 111,
+    "revelationType": "Makki",
+    "startPage": 235,
+    "juzNumber": 12
+  },
+  {
+    "number": 13,
+    "nameArabic": "الرعد",
+    "nameEnglish": "Ar-Ra'd",
+    "englishTranslation": "The Thunder",
+    "totalAyahs": 43,
+    "revelationType": "Madani",
+    "startPage": 249,
+    "juzNumber": 13
+  },
+  {
+    "number": 14,
+    "nameArabic": "إبراهيم",
+    "nameEnglish": "Ibrahim",
+    "englishTranslation": "Abraham",
+    "totalAyahs": 52,
+    "revelationType": "Makki",
+    "startPage": 255,
+    "juzNumber": 13
+  },
+  {
+    "number": 15,
+    "nameArabic": "الحجر",
+    "nameEnglish": "Al-Hijr",
+    "englishTranslation": "The Rocky Tract",
+    "totalAyahs": 99,
+    "revelationType": "Makki",
+    "startPage": 262,
+    "juzNumber": 14
+  },
+  {
+    "number": 16,
+    "nameArabic": "النحل",
+    "nameEnglish": "An-Nahl",
+    "englishTranslation": "The Bee",
+    "totalAyahs": 128,
+    "revelationType": "Makki",
+    "startPage": 267,
+    "juzNumber": 14
+  },
+  {
+    "number": 17,
+    "nameArabic": "الإسراء",
+    "nameEnglish": "Al-Isra",
+    "englishTranslation": "The Night Journey",
+    "totalAyahs": 111,
+    "revelationType": "Makki",
+    "startPage": 282,
+    "juzNumber": 15
+  },
+  {
+    "number": 18,
+    "nameArabic": "الكهف",
+    "nameEnglish": "Al-Kahf",
+    "englishTranslation": "The Cave",
+    "totalAyahs": 110,
+    "revelationType": "Makki",
+    "startPage": 293,
+    "juzNumber": 15
+  },
+  {
+    "number": 19,
+    "nameArabic": "مريم",
+    "nameEnglish": "Maryam",
+    "englishTranslation": "Mary",
+    "totalAyahs": 98,
+    "revelationType": "Makki",
+    "startPage": 305,
+    "juzNumber": 16
+  },
+  {
+    "number": 20,
+    "nameArabic": "طه",
+    "nameEnglish": "Taha",
+    "englishTranslation": "Ta-Ha",
+    "totalAyahs": 135,
+    "revelationType": "Makki",
+    "startPage": 312,
+    "juzNumber": 16
+  },
+  {
+    "number": 21,
+    "nameArabic": "الأنبياء",
+    "nameEnglish": "Al-Anbiya",
+    "englishTranslation": "The Prophets",
+    "totalAyahs": 112,
+    "revelationType": "Makki",
+    "startPage": 322,
+    "juzNumber": 17
+  },
+  {
+    "number": 22,
+    "nameArabic": "الحج",
+    "nameEnglish": "Al-Hajj",
+    "englishTranslation": "The Pilgrimage",
+    "totalAyahs": 78,
+    "revelationType": "Madani",
+    "startPage": 332,
+    "juzNumber": 17
+  },
+  {
+    "number": 23,
+    "nameArabic": "المؤمنون",
+    "nameEnglish": "Al-Mu'minun",
+    "englishTranslation": "The Believers",
+    "totalAyahs": 118,
+    "revelationType": "Makki",
+    "startPage": 342,
+    "juzNumber": 18
+  },
+  {
+    "number": 24,
+    "nameArabic": "النور",
+    "nameEnglish": "An-Nur",
+    "englishTranslation": "The Light",
+    "totalAyahs": 64,
+    "revelationType": "Madani",
+    "startPage": 350,
+    "juzNumber": 18
+  },
+  {
+    "number": 25,
+    "nameArabic": "الفرقان",
+    "nameEnglish": "Al-Furqan",
+    "englishTranslation": "The Criterion",
+    "totalAyahs": 77,
+    "revelationType": "Makki",
+    "startPage": 359,
+    "juzNumber": 18
+  },
+  {
+    "number": 26,
+    "nameArabic": "الشعراء",
+    "nameEnglish": "Ash-Shu'ara",
+    "englishTranslation": "The Poets",
+    "totalAyahs": 227,
+    "revelationType": "Makki",
+    "startPage": 367,
+    "juzNumber": 19
+  },
+  {
+    "number": 27,
+    "nameArabic": "النمل",
+    "nameEnglish": "An-Naml",
+    "englishTranslation": "The Ant",
+    "totalAyahs": 93,
+    "revelationType": "Makki",
+    "startPage": 377,
+    "juzNumber": 19
+  },
+  {
+    "number": 28,
+    "nameArabic": "القصص",
+    "nameEnglish": "Al-Qasas",
+    "englishTranslation": "The Stories",
+    "totalAyahs": 88,
+    "revelationType": "Makki",
+    "startPage": 385,
+    "juzNumber": 20
+  },
+  {
+    "number": 29,
+    "nameArabic": "العنكبوت",
+    "nameEnglish": "Al-'Ankabut",
+    "englishTranslation": "The Spider",
+    "totalAyahs": 69,
+    "revelationType": "Makki",
+    "startPage": 396,
+    "juzNumber": 20
+  },
+  {
+    "number": 30,
+    "nameArabic": "الروم",
+    "nameEnglish": "Ar-Rum",
+    "englishTranslation": "The Romans",
+    "totalAyahs": 60,
+    "revelationType": "Makki",
+    "startPage": 404,
+    "juzNumber": 21
+  },
+  {
+    "number": 31,
+    "nameArabic": "لقمان",
+    "nameEnglish": "Luqman",
+    "englishTranslation": "Luqman",
+    "totalAyahs": 34,
+    "revelationType": "Makki",
+    "startPage": 411,
+    "juzNumber": 21
+  },
+  {
+    "number": 32,
+    "nameArabic": "السجدة",
+    "nameEnglish": "As-Sajdah",
+    "englishTranslation": "The Prostration",
+    "totalAyahs": 30,
+    "revelationType": "Makki",
+    "startPage": 415,
+    "juzNumber": 21
+  },
+  {
+    "number": 33,
+    "nameArabic": "الأحزاب",
+    "nameEnglish": "Al-Ahzab",
+    "englishTranslation": "The Combined Forces",
+    "totalAyahs": 73,
+    "revelationType": "Madani",
+    "startPage": 418,
+    "juzNumber": 21
+  },
+  {
+    "number": 34,
+    "nameArabic": "سبأ",
+    "nameEnglish": "Saba",
+    "englishTranslation": "Sheba",
+    "totalAyahs": 54,
+    "revelationType": "Makki",
+    "startPage": 428,
+    "juzNumber": 22
+  },
+  {
+    "number": 35,
+    "nameArabic": "فاطر",
+    "nameEnglish": "Fatir",
+    "englishTranslation": "Originator",
+    "totalAyahs": 45,
+    "revelationType": "Makki",
+    "startPage": 434,
+    "juzNumber": 22
+  },
+  {
+    "number": 36,
+    "nameArabic": "يس",
+    "nameEnglish": "Ya-Sin",
+    "englishTranslation": "Ya-Sin",
+    "totalAyahs": 83,
+    "revelationType": "Makki",
+    "startPage": 440,
+    "juzNumber": 22
+  },
+  {
+    "number": 37,
+    "nameArabic": "الصافات",
+    "nameEnglish": "As-Saffat",
+    "englishTranslation": "Those Who Set The Ranks",
+    "totalAyahs": 182,
+    "revelationType": "Makki",
+    "startPage": 446,
+    "juzNumber": 23
+  },
+  {
+    "number": 38,
+    "nameArabic": "ص",
+    "nameEnglish": "Sad",
+    "englishTranslation": "The Letter Sad",
+    "totalAyahs": 88,
+    "revelationType": "Makki",
+    "startPage": 453,
+    "juzNumber": 23
+  },
+  {
+    "number": 39,
+    "nameArabic": "الزمر",
+    "nameEnglish": "Az-Zumar",
+    "englishTranslation": "The Troops",
+    "totalAyahs": 75,
+    "revelationType": "Makki",
+    "startPage": 458,
+    "juzNumber": 23
+  },
+  {
+    "number": 40,
+    "nameArabic": "غافر",
+    "nameEnglish": "Ghafir",
+    "englishTranslation": "The Forgiver",
+    "totalAyahs": 85,
+    "revelationType": "Makki",
+    "startPage": 467,
+    "juzNumber": 24
+  },
+  {
+    "number": 41,
+    "nameArabic": "فصلت",
+    "nameEnglish": "Fussilat",
+    "englishTranslation": "Explained In Detail",
+    "totalAyahs": 54,
+    "revelationType": "Makki",
+    "startPage": 477,
+    "juzNumber": 24
+  },
+  {
+    "number": 42,
+    "nameArabic": "الشورى",
+    "nameEnglish": "Ash-Shura",
+    "englishTranslation": "The Consultation",
+    "totalAyahs": 53,
+    "revelationType": "Makki",
+    "startPage": 483,
+    "juzNumber": 25
+  },
+  {
+    "number": 43,
+    "nameArabic": "الزخرف",
+    "nameEnglish": "Az-Zukhruf",
+    "englishTranslation": "The Ornaments Of Gold",
+    "totalAyahs": 89,
+    "revelationType": "Makki",
+    "startPage": 489,
+    "juzNumber": 25
+  },
+  {
+    "number": 44,
+    "nameArabic": "الدخان",
+    "nameEnglish": "Ad-Dukhan",
+    "englishTranslation": "The Smoke",
+    "totalAyahs": 59,
+    "revelationType": "Makki",
+    "startPage": 496,
+    "juzNumber": 25
+  },
+  {
+    "number": 45,
+    "nameArabic": "الجاثية",
+    "nameEnglish": "Al-Jathiyah",
+    "englishTranslation": "The Crouching",
+    "totalAyahs": 37,
+    "revelationType": "Makki",
+    "startPage": 499,
+    "juzNumber": 25
+  },
+  {
+    "number": 46,
+    "nameArabic": "الأحقاف",
+    "nameEnglish": "Al-Ahqaf",
+    "englishTranslation": "The Wind-Curved Sandhills",
+    "totalAyahs": 35,
+    "revelationType": "Makki",
+    "startPage": 502,
+    "juzNumber": 26
+  },
+  {
+    "number": 47,
+    "nameArabic": "محمد",
+    "nameEnglish": "Muhammad",
+    "englishTranslation": "Muhammad",
+    "totalAyahs": 38,
+    "revelationType": "Madani",
+    "startPage": 507,
+    "juzNumber": 26
+  },
+  {
+    "number": 48,
+    "nameArabic": "الفتح",
+    "nameEnglish": "Al-Fath",
+    "englishTranslation": "The Victory",
+    "totalAyahs": 29,
+    "revelationType": "Madani",
+    "startPage": 511,
+    "juzNumber": 26
+  },
+  {
+    "number": 49,
+    "nameArabic": "الحجرات",
+    "nameEnglish": "Al-Hujurat",
+    "englishTranslation": "The Rooms",
+    "totalAyahs": 18,
+    "revelationType": "Madani",
+    "startPage": 515,
+    "juzNumber": 26
+  },
+  {
+    "number": 50,
+    "nameArabic": "ق",
+    "nameEnglish": "Qaf",
+    "englishTranslation": "The Letter Qaf",
+    "totalAyahs": 45,
+    "revelationType": "Makki",
+    "startPage": 518,
+    "juzNumber": 26
+  },
+  {
+    "number": 51,
+    "nameArabic": "الذاريات",
+    "nameEnglish": "Adh-Dhariyat",
+    "englishTranslation": "The Winnowing Winds",
+    "totalAyahs": 60,
+    "revelationType": "Makki",
+    "startPage": 520,
+    "juzNumber": 26
+  },
+  {
+    "number": 52,
+    "nameArabic": "الطور",
+    "nameEnglish": "At-Tur",
+    "englishTranslation": "The Mount",
+    "totalAyahs": 49,
+    "revelationType": "Makki",
+    "startPage": 523,
+    "juzNumber": 27
+  },
+  {
+    "number": 53,
+    "nameArabic": "النجم",
+    "nameEnglish": "An-Najm",
+    "englishTranslation": "The Star",
+    "totalAyahs": 62,
+    "revelationType": "Makki",
+    "startPage": 526,
+    "juzNumber": 27
+  },
+  {
+    "number": 54,
+    "nameArabic": "القمر",
+    "nameEnglish": "Al-Qamar",
+    "englishTranslation": "The Moon",
+    "totalAyahs": 55,
+    "revelationType": "Makki",
+    "startPage": 528,
+    "juzNumber": 27
+  },
+  {
+    "number": 55,
+    "nameArabic": "الرحمن",
+    "nameEnglish": "Ar-Rahman",
+    "englishTranslation": "The Beneficent",
+    "totalAyahs": 78,
+    "revelationType": "Madani",
+    "startPage": 531,
+    "juzNumber": 27
+  },
+  {
+    "number": 56,
+    "nameArabic": "الواقعة",
+    "nameEnglish": "Al-Waqi'ah",
+    "englishTranslation": "The Inevitable",
+    "totalAyahs": 96,
+    "revelationType": "Makki",
+    "startPage": 534,
+    "juzNumber": 27
+  },
+  {
+    "number": 57,
+    "nameArabic": "الحديد",
+    "nameEnglish": "Al-Hadid",
+    "englishTranslation": "The Iron",
+    "totalAyahs": 29,
+    "revelationType": "Madani",
+    "startPage": 537,
+    "juzNumber": 27
+  },
+  {
+    "number": 58,
+    "nameArabic": "المجادلة",
+    "nameEnglish": "Al-Mujadila",
+    "englishTranslation": "The Pleading Woman",
+    "totalAyahs": 22,
+    "revelationType": "Madani",
+    "startPage": 542,
+    "juzNumber": 28
+  },
+  {
+    "number": 59,
+    "nameArabic": "الحشر",
+    "nameEnglish": "Al-Hashr",
+    "englishTranslation": "The Exile",
+    "totalAyahs": 24,
+    "revelationType": "Madani",
+    "startPage": 545,
+    "juzNumber": 28
+  },
+  {
+    "number": 60,
+    "nameArabic": "الممتحنة",
+    "nameEnglish": "Al-Mumtahanah",
+    "englishTranslation": "She That Is To Be Examined",
+    "totalAyahs": 13,
+    "revelationType": "Madani",
+    "startPage": 549,
+    "juzNumber": 28
+  },
+  {
+    "number": 61,
+    "nameArabic": "الصف",
+    "nameEnglish": "As-Saff",
+    "englishTranslation": "The Ranks",
+    "totalAyahs": 14,
+    "revelationType": "Madani",
+    "startPage": 551,
+    "juzNumber": 28
+  },
+  {
+    "number": 62,
+    "nameArabic": "الجمعة",
+    "nameEnglish": "Al-Jumu'ah",
+    "englishTranslation": "Friday",
+    "totalAyahs": 11,
+    "revelationType": "Madani",
+    "startPage": 553,
+    "juzNumber": 28
+  },
+  {
+    "number": 63,
+    "nameArabic": "المنافقون",
+    "nameEnglish": "Al-Munafiqun",
+    "englishTranslation": "The Hypocrites",
+    "totalAyahs": 11,
+    "revelationType": "Madani",
+    "startPage": 554,
+    "juzNumber": 28
+  },
+  {
+    "number": 64,
+    "nameArabic": "التغابن",
+    "nameEnglish": "At-Taghabun",
+    "englishTranslation": "The Mutual Disillusion",
+    "totalAyahs": 18,
+    "revelationType": "Madani",
+    "startPage": 556,
+    "juzNumber": 28
+  },
+  {
+    "number": 65,
+    "nameArabic": "الطلاق",
+    "nameEnglish": "At-Talaq",
+    "englishTranslation": "The Divorce",
+    "totalAyahs": 12,
+    "revelationType": "Madani",
+    "startPage": 558,
+    "juzNumber": 28
+  },
+  {
+    "number": 66,
+    "nameArabic": "التحريم",
+    "nameEnglish": "At-Tahrim",
+    "englishTranslation": "The Prohibition",
+    "totalAyahs": 12,
+    "revelationType": "Madani",
+    "startPage": 560,
+    "juzNumber": 28
+  },
+  {
+    "number": 67,
+    "nameArabic": "الملك",
+    "nameEnglish": "Al-Mulk",
+    "englishTranslation": "The Sovereignty",
+    "totalAyahs": 30,
+    "revelationType": "Makki",
+    "startPage": 562,
+    "juzNumber": 29
+  },
+  {
+    "number": 68,
+    "nameArabic": "القلم",
+    "nameEnglish": "Al-Qalam",
+    "englishTranslation": "The Pen",
+    "totalAyahs": 52,
+    "revelationType": "Makki",
+    "startPage": 564,
+    "juzNumber": 29
+  },
+  {
+    "number": 69,
+    "nameArabic": "الحاقة",
+    "nameEnglish": "Al-Haqqah",
+    "englishTranslation": "The Reality",
+    "totalAyahs": 52,
+    "revelationType": "Makki",
+    "startPage": 566,
+    "juzNumber": 29
+  },
+  {
+    "number": 70,
+    "nameArabic": "المعارج",
+    "nameEnglish": "Al-Ma'arij",
+    "englishTranslation": "The Ascending Stairways",
+    "totalAyahs": 44,
+    "revelationType": "Makki",
+    "startPage": 568,
+    "juzNumber": 29
+  },
+  {
+    "number": 71,
+    "nameArabic": "نوح",
+    "nameEnglish": "Nuh",
+    "englishTranslation": "Noah",
+    "totalAyahs": 28,
+    "revelationType": "Makki",
+    "startPage": 570,
+    "juzNumber": 29
+  },
+  {
+    "number": 72,
+    "nameArabic": "الجن",
+    "nameEnglish": "Al-Jinn",
+    "englishTranslation": "The Jinn",
+    "totalAyahs": 28,
+    "revelationType": "Makki",
+    "startPage": 572,
+    "juzNumber": 29
+  },
+  {
+    "number": 73,
+    "nameArabic": "المزمل",
+    "nameEnglish": "Al-Muzzammil",
+    "englishTranslation": "The Enshrouded One",
+    "totalAyahs": 20,
+    "revelationType": "Makki",
+    "startPage": 574,
+    "juzNumber": 29
+  },
+  {
+    "number": 74,
+    "nameArabic": "المدثر",
+    "nameEnglish": "Al-Muddaththir",
+    "englishTranslation": "The Cloaked One",
+    "totalAyahs": 56,
+    "revelationType": "Makki",
+    "startPage": 575,
+    "juzNumber": 29
+  },
+  {
+    "number": 75,
+    "nameArabic": "القيامة",
+    "nameEnglish": "Al-Qiyamah",
+    "englishTranslation": "The Resurrection",
+    "totalAyahs": 40,
+    "revelationType": "Makki",
+    "startPage": 577,
+    "juzNumber": 29
+  },
+  {
+    "number": 76,
+    "nameArabic": "الإنسان",
+    "nameEnglish": "Al-Insan",
+    "englishTranslation": "Man",
+    "totalAyahs": 31,
+    "revelationType": "Madani",
+    "startPage": 578,
+    "juzNumber": 29
+  },
+  {
+    "number": 77,
+    "nameArabic": "المرسلات",
+    "nameEnglish": "Al-Mursalat",
+    "englishTranslation": "The Emissaries",
+    "totalAyahs": 50,
+    "revelationType": "Makki",
+    "startPage": 580,
+    "juzNumber": 29
+  },
+  {
+    "number": 78,
+    "nameArabic": "النبأ",
+    "nameEnglish": "An-Naba",
+    "englishTranslation": "The Tidings",
+    "totalAyahs": 40,
+    "revelationType": "Makki",
+    "startPage": 582,
+    "juzNumber": 30
+  },
+  {
+    "number": 79,
+    "nameArabic": "النازعات",
+    "nameEnglish": "An-Nazi'at",
+    "englishTranslation": "Those Who Drag Forth",
+    "totalAyahs": 46,
+    "revelationType": "Makki",
+    "startPage": 583,
+    "juzNumber": 30
+  },
+  {
+    "number": 80,
+    "nameArabic": "عبس",
+    "nameEnglish": "'Abasa",
+    "englishTranslation": "He Frowned",
+    "totalAyahs": 42,
+    "revelationType": "Makki",
+    "startPage": 585,
+    "juzNumber": 30
+  },
+  {
+    "number": 81,
+    "nameArabic": "التكوير",
+    "nameEnglish": "At-Takwir",
+    "englishTranslation": "The Overthrowing",
+    "totalAyahs": 29,
+    "revelationType": "Makki",
+    "startPage": 586,
+    "juzNumber": 30
+  },
+  {
+    "number": 82,
+    "nameArabic": "الانفطار",
+    "nameEnglish": "Al-Infitar",
+    "englishTranslation": "The Cleaving",
+    "totalAyahs": 19,
+    "revelationType": "Makki",
+    "startPage": 587,
+    "juzNumber": 30
+  },
+  {
+    "number": 83,
+    "nameArabic": "المطففين",
+    "nameEnglish": "Al-Mutaffifin",
+    "englishTranslation": "Defrauding",
+    "totalAyahs": 36,
+    "revelationType": "Makki",
+    "startPage": 587,
+    "juzNumber": 30
+  },
+  {
+    "number": 84,
+    "nameArabic": "الانشقاق",
+    "nameEnglish": "Al-Inshiqaq",
+    "englishTranslation": "The Splitting Open",
+    "totalAyahs": 25,
+    "revelationType": "Makki",
+    "startPage": 589,
+    "juzNumber": 30
+  },
+  {
+    "number": 85,
+    "nameArabic": "البروج",
+    "nameEnglish": "Al-Buruj",
+    "englishTranslation": "The Constellations",
+    "totalAyahs": 22,
+    "revelationType": "Makki",
+    "startPage": 590,
+    "juzNumber": 30
+  },
+  {
+    "number": 86,
+    "nameArabic": "الطارق",
+    "nameEnglish": "At-Tariq",
+    "englishTranslation": "The Nightcomer",
+    "totalAyahs": 17,
+    "revelationType": "Makki",
+    "startPage": 591,
+    "juzNumber": 30
+  },
+  {
+    "number": 87,
+    "nameArabic": "الأعلى",
+    "nameEnglish": "Al-A'la",
+    "englishTranslation": "The Most High",
+    "totalAyahs": 19,
+    "revelationType": "Makki",
+    "startPage": 591,
+    "juzNumber": 30
+  },
+  {
+    "number": 88,
+    "nameArabic": "الغاشية",
+    "nameEnglish": "Al-Ghashiyah",
+    "englishTranslation": "The Overwhelming",
+    "totalAyahs": 26,
+    "revelationType": "Makki",
+    "startPage": 592,
+    "juzNumber": 30
+  },
+  {
+    "number": 89,
+    "nameArabic": "الفجر",
+    "nameEnglish": "Al-Fajr",
+    "englishTranslation": "The Dawn",
+    "totalAyahs": 30,
+    "revelationType": "Makki",
+    "startPage": 593,
+    "juzNumber": 30
+  },
+  {
+    "number": 90,
+    "nameArabic": "البلد",
+    "nameEnglish": "Al-Balad",
+    "englishTranslation": "The City",
+    "totalAyahs": 20,
+    "revelationType": "Makki",
+    "startPage": 594,
+    "juzNumber": 30
+  },
+  {
+    "number": 91,
+    "nameArabic": "الشمس",
+    "nameEnglish": "Ash-Shams",
+    "englishTranslation": "The Sun",
+    "totalAyahs": 15,
+    "revelationType": "Makki",
+    "startPage": 595,
+    "juzNumber": 30
+  },
+  {
+    "number": 92,
+    "nameArabic": "الليل",
+    "nameEnglish": "Al-Layl",
+    "englishTranslation": "The Night",
+    "totalAyahs": 21,
+    "revelationType": "Makki",
+    "startPage": 595,
+    "juzNumber": 30
+  },
+  {
+    "number": 93,
+    "nameArabic": "الضحى",
+    "nameEnglish": "Ad-Duha",
+    "englishTranslation": "The Morning Hours",
+    "totalAyahs": 11,
+    "revelationType": "Makki",
+    "startPage": 596,
+    "juzNumber": 30
+  },
+  {
+    "number": 94,
+    "nameArabic": "الشرح",
+    "nameEnglish": "Ash-Sharh",
+    "englishTranslation": "The Relief",
+    "totalAyahs": 8,
+    "revelationType": "Makki",
+    "startPage": 596,
+    "juzNumber": 30
+  },
+  {
+    "number": 95,
+    "nameArabic": "التين",
+    "nameEnglish": "At-Tin",
+    "englishTranslation": "The Fig",
+    "totalAyahs": 8,
+    "revelationType": "Makki",
+    "startPage": 597,
+    "juzNumber": 30
+  },
+  {
+    "number": 96,
+    "nameArabic": "العلق",
+    "nameEnglish": "Al-'Alaq",
+    "englishTranslation": "The Clot",
+    "totalAyahs": 19,
+    "revelationType": "Makki",
+    "startPage": 597,
+    "juzNumber": 30
+  },
+  {
+    "number": 97,
+    "nameArabic": "القدر",
+    "nameEnglish": "Al-Qadr",
+    "englishTranslation": "The Power",
+    "totalAyahs": 5,
+    "revelationType": "Makki",
+    "startPage": 598,
+    "juzNumber": 30
+  },
+  {
+    "number": 98,
+    "nameArabic": "البينة",
+    "nameEnglish": "Al-Bayyinah",
+    "englishTranslation": "The Clear Proof",
+    "totalAyahs": 8,
+    "revelationType": "Madani",
+    "startPage": 598,
+    "juzNumber": 30
+  },
+  {
+    "number": 99,
+    "nameArabic": "الزلزلة",
+    "nameEnglish": "Az-Zalzalah",
+    "englishTranslation": "The Earthquake",
+    "totalAyahs": 8,
+    "revelationType": "Madani",
+    "startPage": 599,
+    "juzNumber": 30
+  },
+  {
+    "number": 100,
+    "nameArabic": "العاديات",
+    "nameEnglish": "Al-'Adiyat",
+    "englishTranslation": "The Courser",
+    "totalAyahs": 11,
+    "revelationType": "Makki",
+    "startPage": 599,
+    "juzNumber": 30
+  },
+  {
+    "number": 101,
+    "nameArabic": "القارعة",
+    "nameEnglish": "Al-Qari'ah",
+    "englishTranslation": "The Calamity",
+    "totalAyahs": 11,
+    "revelationType": "Makki",
+    "startPage": 600,
+    "juzNumber": 30
+  },
+  {
+    "number": 102,
+    "nameArabic": "التكاثر",
+    "nameEnglish": "At-Takathur",
+    "englishTranslation": "The Rivalry in World Increase",
+    "totalAyahs": 8,
+    "revelationType": "Makki",
+    "startPage": 600,
+    "juzNumber": 30
+  },
+  {
+    "number": 103,
+    "nameArabic": "العصر",
+    "nameEnglish": "Al-'Asr",
+    "englishTranslation": "The Declining Day",
+    "totalAyahs": 3,
+    "revelationType": "Makki",
+    "startPage": 601,
+    "juzNumber": 30
+  },
+  {
+    "number": 104,
+    "nameArabic": "الهمزة",
+    "nameEnglish": "Al-Humazah",
+    "englishTranslation": "The Traducer",
+    "totalAyahs": 9,
+    "revelationType": "Makki",
+    "startPage": 601,
+    "juzNumber": 30
+  },
+  {
+    "number": 105,
+    "nameArabic": "الفيل",
+    "nameEnglish": "Al-Fil",
+    "englishTranslation": "The Elephant",
+    "totalAyahs": 5,
+    "revelationType": "Makki",
+    "startPage": 601,
+    "juzNumber": 30
+  },
+  {
+    "number": 106,
+    "nameArabic": "قريش",
+    "nameEnglish": "Quraysh",
+    "englishTranslation": "Quraysh",
+    "totalAyahs": 4,
+    "revelationType": "Makki",
+    "startPage": 602,
+    "juzNumber": 30
+  },
+  {
+    "number": 107,
+    "nameArabic": "الماعون",
+    "nameEnglish": "Al-Ma'un",
+    "englishTranslation": "The Small Kindnesses",
+    "totalAyahs": 7,
+    "revelationType": "Makki",
+    "startPage": 602,
+    "juzNumber": 30
+  },
+  {
+    "number": 108,
+    "nameArabic": "الكوثر",
+    "nameEnglish": "Al-Kawthar",
+    "englishTranslation": "Abundance",
+    "totalAyahs": 3,
+    "revelationType": "Makki",
+    "startPage": 602,
+    "juzNumber": 30
+  },
+  {
+    "number": 109,
+    "nameArabic": "الكافرون",
+    "nameEnglish": "Al-Kafirun",
+    "englishTranslation": "The Disbelievers",
+    "totalAyahs": 6,
+    "revelationType": "Makki",
+    "startPage": 603,
+    "juzNumber": 30
+  },
+  {
+    "number": 110,
+    "nameArabic": "النصر",
+    "nameEnglish": "An-Nasr",
+    "englishTranslation": "The Divine Support",
+    "totalAyahs": 3,
+    "revelationType": "Madani",
+    "startPage": 603,
+    "juzNumber": 30
+  },
+  {
+    "number": 111,
+    "nameArabic": "المسد",
+    "nameEnglish": "Al-Masad",
+    "englishTranslation": "The Palm Fiber",
+    "totalAyahs": 5,
+    "revelationType": "Makki",
+    "startPage": 603,
+    "juzNumber": 30
+  },
+  {
+    "number": 112,
+    "nameArabic": "الإخلاص",
+    "nameEnglish": "Al-Ikhlas",
+    "englishTranslation": "Sincerity",
+    "totalAyahs": 4,
+    "revelationType": "Makki",
+    "startPage": 604,
+    "juzNumber": 30
+  },
+  {
+    "number": 113,
+    "nameArabic": "الفلق",
+    "nameEnglish": "Al-Falaq",
+    "englishTranslation": "Daybreak",
+    "totalAyahs": 5,
+    "revelationType": "Makki",
+    "startPage": 604,
+    "juzNumber": 30
+  },
+  {
+    "number": 114,
+    "nameArabic": "الناس",
+    "nameEnglish": "An-Nas",
+    "englishTranslation": "Mankind",
+    "totalAyahs": 6,
+    "revelationType": "Makki",
+    "startPage": 604,
+    "juzNumber": 30
+  }
+]

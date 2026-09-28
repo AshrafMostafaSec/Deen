@@ -29,20 +29,31 @@ public final class TodayViewModel {
     public let dailyHadithSource: String = "Sahih Muslim"
     
     private let engine = PrayerEngine()
-    private nonisolated(unsafe) var countdownTimer: Timer?
+    private var tickerTask: Task<Void, Never>?
     private var remainingSeconds: Int = 5174
     
     public init() {
-        self.prayerSchedule = engine.calculateSchedule(
+        let schedule = engine.calculateSchedule(
             date: Date(),
             latitude: 24.7136,
             longitude: 46.6753,
             locationName: "Riyadh"
         )
-        self.remainingSeconds = prayerSchedule.nextPrayerCountdownSeconds
-        updateCountdownString()
-        startTimer()
+        self.prayerSchedule = schedule
+        self.remainingSeconds = schedule.nextPrayerCountdownSeconds
+        let hours = schedule.nextPrayerCountdownSeconds / 3600
+        let minutes = (schedule.nextPrayerCountdownSeconds % 3600) / 60
+        let seconds = schedule.nextPrayerCountdownSeconds % 60
+        self.countdownString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+    
+    public func onAppear() {
+        startCountdownTicker()
         updateRemindersAndQiyam()
+    }
+    
+    public func onDisappear() {
+        stopCountdownTicker()
     }
     
     public func updateLocation(latitude: Double, longitude: Double, name: String) {
@@ -63,7 +74,7 @@ public final class TodayViewModel {
         updateRemindersAndQiyam()
     }
     
-    private func updateRemindersAndQiyam() {
+    public func updateRemindersAndQiyam() {
         NotificationService.shared.schedulePrayerReminders(schedule: prayerSchedule)
         if let maghrib = prayerSchedule.times.first(where: { $0.kind == .maghrib })?.date,
            let fajr = prayerSchedule.times.first(where: { $0.kind == .fajr })?.date {
@@ -76,11 +87,12 @@ public final class TodayViewModel {
         }
     }
     
-    private func startTimer() {
-        countdownTimer?.invalidate()
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            Task { @MainActor in
+    public func startCountdownTicker() {
+        stopCountdownTicker()
+        tickerTask = Task { @MainActor in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                if Task.isCancelled { break }
                 if self.remainingSeconds > 0 {
                     self.remainingSeconds -= 1
                     self.updateCountdownString()
@@ -89,14 +101,15 @@ public final class TodayViewModel {
         }
     }
     
+    public func stopCountdownTicker() {
+        tickerTask?.cancel()
+        tickerTask = nil
+    }
+    
     private func updateCountdownString() {
         let hours = remainingSeconds / 3600
         let minutes = (remainingSeconds % 3600) / 60
         let seconds = remainingSeconds % 60
         self.countdownString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-    
-    deinit {
-        countdownTimer?.invalidate()
     }
 }

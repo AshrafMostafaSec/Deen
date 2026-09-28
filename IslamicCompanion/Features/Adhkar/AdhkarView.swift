@@ -25,6 +25,9 @@ public struct AdhkarView: View {
             .padding(.bottom, 120)
         }
         .background(AppColor.background.ignoresSafeArea())
+        .sheet(item: $viewModel.selectedCategoryForSheet) { cat in
+            AdhkarCategoryDetailSheet(category: cat, viewModel: viewModel)
+        }
     }
     
     // MARK: - Sections
@@ -62,7 +65,7 @@ public struct AdhkarView: View {
                         .font(AppFont.interfaceLabel(size: 12))
                         .foregroundColor(AppColor.primary)
                     Spacer()
-                    Text("Remaining: \(viewModel.totalCount - viewModel.totalCompleted)")
+                    Text("Remaining: \(max(0, viewModel.totalCount - viewModel.totalCompleted))")
                         .font(AppFont.interfaceLabel(size: 11))
                         .foregroundColor(AppColor.onSurfaceVariant)
                 }
@@ -92,58 +95,63 @@ public struct AdhkarView: View {
                     .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
                     .foregroundColor(AppColor.onSurface)
                 Spacer()
-                Text("View All")
+                Text("Tap to Read")
                     .font(AppFont.interfaceLabel(size: 12))
                     .foregroundColor(AppColor.secondary)
             }
             
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                 ForEach(viewModel.categories) { cat in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            ZStack {
-                                Circle()
-                                    .fill(cat.isReady ? AppColor.primaryContainer : AppColor.surfaceContainerHighest)
-                                    .frame(width: 36, height: 36)
-                                Image(systemName: cat.iconName)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(cat.isReady ? AppColor.primary : AppColor.secondary)
+                    Button {
+                        viewModel.selectedCategoryForSheet = cat
+                    } label: {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                ZStack {
+                                    Circle()
+                                        .fill(cat.isReady ? AppColor.primaryContainer : AppColor.surfaceContainerHighest)
+                                        .frame(width: 36, height: 36)
+                                    Image(systemName: cat.iconName)
+                                        .font(.system(size: 16))
+                                        .foregroundColor(cat.isReady ? AppColor.primary : AppColor.secondary)
+                                }
+                                Spacer()
+                                if cat.isReady {
+                                    Text("NOW")
+                                        .font(AppFont.technicalMetric(size: 9, weight: .bold))
+                                        .foregroundColor(AppColor.primary)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(AppColor.primaryContainer.opacity(0.5))
+                                        .clipShape(Capsule())
+                                }
                             }
-                            Spacer()
-                            if cat.isReady {
-                                Text("NOW")
-                                    .font(AppFont.technicalMetric(size: 9, weight: .bold))
-                                    .foregroundColor(AppColor.primary)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(AppColor.primaryContainer.opacity(0.5))
-                                    .clipShape(Capsule())
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(cat.titleEnglish)
+                                    .font(AppFont.interfaceLabel(size: 14, weight: .semibold))
+                                    .foregroundColor(AppColor.onSurface)
+                                Text(cat.titleArabic)
+                                    .font(AppFont.arabicHeading(size: 13))
+                                    .foregroundColor(AppColor.secondary)
                             }
+                            
+                            Text(cat.countText)
+                                .font(AppFont.interface(size: 10))
+                                .foregroundColor(AppColor.onSurfaceVariant)
+                                .lineLimit(1)
                         }
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(cat.titleEnglish)
-                                .font(AppFont.interfaceLabel(size: 14, weight: .semibold))
-                                .foregroundColor(AppColor.onSurface)
-                            Text(cat.titleArabic)
-                                .font(AppFont.arabicHeading(size: 13))
-                                .foregroundColor(AppColor.secondary)
+                        .padding(AppSpacing.spaceMd)
+                        .background {
+                            RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                                .fill(AppColor.surfaceContainerLow)
                         }
-                        
-                        Text(cat.countText)
-                            .font(AppFont.interface(size: 10))
-                            .foregroundColor(AppColor.onSurfaceVariant)
-                            .lineLimit(1)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                                .strokeBorder(cat.isReady ? AppColor.primary.opacity(0.4) : AppColor.hairlineBorder, lineWidth: 1)
+                        }
                     }
-                    .padding(AppSpacing.spaceMd)
-                    .background {
-                        RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
-                            .fill(AppColor.surfaceContainerLow)
-                    }
-                    .overlay {
-                        RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
-                            .strokeBorder(cat.isReady ? AppColor.primary.opacity(0.4) : AppColor.hairlineBorder, lineWidth: 1)
-                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -269,5 +277,121 @@ public struct AdhkarView: View {
         .frame(maxWidth: .infinity)
         .padding(AppSpacing.spaceMd)
         .astrolabeGlass(cornerRadius: AppRadius.card)
+    }
+}
+
+// MARK: - Dedicated Category Detail Sheet
+struct AdhkarCategoryDetailSheet: View {
+    let category: AdhkarCategoryItem
+    @Bindable var viewModel: AdhkarViewModel
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            let items = viewModel.fortressCatalog.items(for: category.id)
+            ScrollView {
+                VStack(spacing: AppSpacing.spaceMd) {
+                    // Header Banner
+                    VStack(spacing: 6) {
+                        Text(category.titleArabic)
+                            .font(AppFont.arabicHeading(size: 26))
+                            .foregroundColor(AppColor.primary)
+                        Text(category.titleEnglish)
+                            .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
+                            .foregroundColor(AppColor.onSurface)
+                        Text("\(items.count) authentic supplications from Hisn Al-Muslim")
+                            .font(AppFont.interface(size: 12))
+                            .foregroundColor(AppColor.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(AppSpacing.spaceLg)
+                    .astrolabeGlass(cornerRadius: AppRadius.large, isElevated: true)
+                    
+                    // List of Supplications
+                    LazyVStack(spacing: 12) {
+                        ForEach(items) { item in
+                            let count = viewModel.itemProgress[item.id] ?? 0
+                            let isDone = count >= item.targetCount
+                            
+                            VStack(alignment: .trailing, spacing: 10) {
+                                // Hadith Reference & Progress Badge
+                                HStack {
+                                    Button {
+                                        viewModel.incrementItem(item: item)
+                                    } label: {
+                                        HStack(spacing: 6) {
+                                            Image(systemName: isDone ? "checkmark.circle.fill" : "hand.tap.fill")
+                                                .font(.system(size: 12))
+                                            Text(isDone ? "Completed" : "\(count) / \(item.targetCount)")
+                                                .font(AppFont.technicalMetric(size: 12, weight: .bold))
+                                        }
+                                        .foregroundColor(isDone ? AppColor.onPrimary : AppColor.primary)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            Capsule().fill(isDone ? AppColor.primary : AppColor.primaryContainer.opacity(0.4))
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                    
+                                    Spacer()
+                                    
+                                    Text(item.reference)
+                                        .font(AppFont.interfaceLabel(size: 11))
+                                        .foregroundColor(AppColor.tertiary)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(AppColor.surfaceContainerHighest)
+                                        .clipShape(Capsule())
+                                }
+                                
+                                // Sacred Arabic Dhikr
+                                Text(item.textArabic)
+                                    .font(AppFont.quranScripture(size: 22))
+                                    .foregroundColor(isDone ? AppColor.primary : AppColor.onSurface)
+                                    .multilineTextAlignment(.trailing)
+                                    .lineSpacing(8)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .padding(.top, 4)
+                                
+                                // English Meaning
+                                Text(item.textEnglish)
+                                    .font(AppFont.interface(size: 13))
+                                    .foregroundColor(AppColor.onSurfaceVariant)
+                                    .multilineTextAlignment(.leading)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.top, 2)
+                            }
+                            .padding(AppSpacing.spaceMd)
+                            .background {
+                                RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                                    .fill(isDone ? AppColor.primaryContainer.opacity(0.2) : AppColor.surfaceContainerLow)
+                            }
+                            .overlay {
+                                RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                                    .strokeBorder(isDone ? AppColor.primary.opacity(0.5) : AppColor.hairlineBorder, lineWidth: 1)
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, AppSpacing.margin)
+                .padding(.vertical, AppSpacing.spaceMd)
+                .padding(.bottom, 60)
+            }
+            .background(AppColor.background.ignoresSafeArea())
+            .navigationTitle(category.titleEnglish)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(AppColor.outline)
+                            .font(.system(size: 20))
+                    }
+                }
+            }
+        }
     }
 }

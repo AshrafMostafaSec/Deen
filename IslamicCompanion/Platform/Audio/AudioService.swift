@@ -44,7 +44,6 @@ public final class AudioService: NSObject {
     deinit {
         statusObservation?.invalidate()
         timeControlObservation?.invalidate()
-        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Public Playback API
@@ -247,22 +246,20 @@ public final class AudioService: NSObject {
     }
     
     private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleInterruption),
-            name: AVAudioSession.interruptionNotification,
-            object: nil
-        )
+        Task { @MainActor in
+            for await notification in NotificationCenter.default.notifications(named: AVAudioSession.interruptionNotification) {
+                self.handleInterruption(notification: notification)
+            }
+        }
         
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleRouteChange),
-            name: AVAudioSession.routeChangeNotification,
-            object: nil
-        )
+        Task { @MainActor in
+            for await notification in NotificationCenter.default.notifications(named: AVAudioSession.routeChangeNotification) {
+                self.handleRouteChange(notification: notification)
+            }
+        }
     }
     
-    @objc private func handleInterruption(notification: Notification) {
+    private func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
@@ -286,7 +283,7 @@ public final class AudioService: NSObject {
         }
     }
     
-    @objc private func handleRouteChange(notification: Notification) {
+    private func handleRouteChange(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }

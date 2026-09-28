@@ -8,15 +8,15 @@ public struct AdhkarCategoryItem: Identifiable, Codable, Sendable {
     public let countText: String
     public let iconName: String
     public let isReady: Bool
-    public let completedItems: Int
-    public let totalItems: Int
+    public var completedItems: Int
+    public var totalItems: Int
 }
 
 @MainActor
 @Observable
 public final class AdhkarViewModel {
-    public var totalCompleted: Int = 32
-    public var totalCount: Int = 48
+    public var totalCompleted: Int = 0
+    public var totalCount: Int = 21
     public var isHapticEnabled: Bool = true
     
     // Focused Tasbeeh Pad State
@@ -25,15 +25,49 @@ public final class AdhkarViewModel {
     public var currentDhikrText: String = "« سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ »"
     public var currentDhikrVirtue: String = "Light on the tongue, heavy in the scales."
     
+    public var selectedCategoryForSheet: AdhkarCategoryItem? = nil
+    public var fortressCatalog: AdhkarFortressCatalog = AdhkarFortressCatalog()
+    public var itemProgress: [String: Int] = [:]
+    
     public var categories: [AdhkarCategoryItem] = [
-        AdhkarCategoryItem(id: "morning", titleEnglish: "Morning Adhkar", titleArabic: "أذكار الصباح", countText: "24 items • 18 completed", iconName: "sun.max.fill", isReady: false, completedItems: 18, totalItems: 24),
-        AdhkarCategoryItem(id: "evening", titleEnglish: "Evening Adhkar", titleArabic: "أذكار المساء", countText: "24 items • Ready to read", iconName: "moon.fill", isReady: true, completedItems: 0, totalItems: 24),
-        AdhkarCategoryItem(id: "post_prayer", titleEnglish: "After Prayer", titleArabic: "أذكار بعد الصلاة", countText: "8 items • Tasbeeh & Istighfar", iconName: "hands.sparkles.fill", isReady: false, completedItems: 8, totalItems: 8),
-        AdhkarCategoryItem(id: "sleep", titleEnglish: "Sleep Adhkar", titleArabic: "أذكار النوم", countText: "12 items • Peace & tranquility", iconName: "bed.double.fill", isReady: false, completedItems: 0, totalItems: 12)
+        AdhkarCategoryItem(id: "morning", titleEnglish: "Morning Adhkar", titleArabic: "أذكار الصباح", countText: "7 authentic items • Protection", iconName: "sun.max.fill", isReady: true, completedItems: 0, totalItems: 7),
+        AdhkarCategoryItem(id: "evening", titleEnglish: "Evening Adhkar", titleArabic: "أذكار المساء", countText: "5 authentic items • Serenity", iconName: "moon.fill", isReady: false, completedItems: 0, totalItems: 5),
+        AdhkarCategoryItem(id: "post_prayer", titleEnglish: "After Prayer", titleArabic: "أذكار بعد الصلاة", countText: "6 authentic items • Tasbeeh", iconName: "hands.sparkles.fill", isReady: false, completedItems: 0, totalItems: 6),
+        AdhkarCategoryItem(id: "sleep", titleEnglish: "Sleep Adhkar", titleArabic: "أذكار النوم", countText: "3 authentic items • Tranquility", iconName: "bed.double.fill", isReady: false, completedItems: 0, totalItems: 3)
     ]
     
+    public init() {
+        loadCatalog()
+    }
+    
+    public func loadCatalog() {
+        if let url = Bundle.main.url(forResource: "adhkar_fortress", withExtension: "json") ??
+                     Bundle.main.url(forResource: "adhkar_fortress", withExtension: "json", subdirectory: "Adhkar"),
+           let data = try? Data(contentsOf: url),
+           let catalog = try? JSONDecoder().decode(AdhkarFortressCatalog.self, from: data) {
+            self.fortressCatalog = catalog
+            self.totalCount = catalog.morning.count + catalog.evening.count + catalog.post_prayer.count + catalog.sleep.count
+            
+            for i in 0..<categories.count {
+                let id = categories[i].id
+                let count = catalog.items(for: id).count
+                categories[i] = AdhkarCategoryItem(
+                    id: categories[i].id,
+                    titleEnglish: categories[i].titleEnglish,
+                    titleArabic: categories[i].titleArabic,
+                    countText: "\(count) authentic items • Hisn Al-Muslim",
+                    iconName: categories[i].iconName,
+                    isReady: categories[i].isReady,
+                    completedItems: categories[i].completedItems,
+                    totalItems: count
+                )
+            }
+        }
+    }
+    
     public var completionPercentage: Int {
-        Int((Double(totalCompleted) / Double(totalCount)) * 100.0)
+        guard totalCount > 0 else { return 0 }
+        return Int((Double(totalCompleted) / Double(totalCount)) * 100.0)
     }
     
     public func incrementTasbeeh() {
@@ -47,6 +81,26 @@ public final class AdhkarViewModel {
     
     public func resetTasbeeh() {
         currentTasbeehCount = 0
+        triggerHaptic()
+    }
+    
+    public func incrementItem(item: AdhkarItem) {
+        let current = itemProgress[item.id] ?? 0
+        if current < item.targetCount {
+            let next = current + 1
+            itemProgress[item.id] = next
+            if next == item.targetCount {
+                totalCompleted += 1
+            }
+        }
+        triggerHaptic()
+    }
+    
+    public func resetItem(item: AdhkarItem) {
+        if let current = itemProgress[item.id], current >= item.targetCount {
+            totalCompleted = max(0, totalCompleted - 1)
+        }
+        itemProgress[item.id] = 0
         triggerHaptic()
     }
     

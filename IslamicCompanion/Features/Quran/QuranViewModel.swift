@@ -36,7 +36,40 @@ public final class QuranViewModel {
     public var featuredSurahName: String = "Surah Al-Kahf"
     public var isFeaturedPlaying: Bool = false
     
-    public let surahs: [SurahMetadata] = [
+    public private(set) var surahs: [SurahMetadata] = []
+    
+    public init() {
+        self.surahs = Self.loadSurahs()
+    }
+    
+    private static func loadSurahs() -> [SurahMetadata] {
+        if let url = Bundle.main.url(forResource: "surahs_114", withExtension: "json") ??
+                     Bundle.main.url(forResource: "surahs_114", withExtension: "json", subdirectory: "Quran"),
+           let data = try? Data(contentsOf: url),
+           let decoded = try? JSONDecoder().decode([SurahMetadata].self, from: data),
+           !decoded.isEmpty {
+            return decoded
+        }
+        return fallbackSurahs
+    }
+    
+    public var filteredSurahs: [SurahMetadata] {
+        if searchText.isEmpty {
+            return surahs
+        } else {
+            return surahs.filter {
+                $0.nameEnglish.localizedCaseInsensitiveContains(searchText) ||
+                $0.nameArabic.contains(searchText) ||
+                "\($0.number)".contains(searchText)
+            }
+        }
+    }
+    
+    public func toggleFeaturedAudio() {
+        isFeaturedPlaying.toggle()
+    }
+    
+    public static let fallbackSurahs: [SurahMetadata] = [
         SurahMetadata(number: 1, nameArabic: "الفاتحة", nameEnglish: "Al-Fatihah", englishTranslation: "The Opening", totalAyahs: 7, revelationType: .makkah, startPage: 1, juzNumber: 1),
         SurahMetadata(number: 2, nameArabic: "البقرة", nameEnglish: "Al-Baqarah", englishTranslation: "The Cow", totalAyahs: 286, revelationType: .madinah, startPage: 2, juzNumber: 1),
         SurahMetadata(number: 3, nameArabic: "آل عمران", nameEnglish: "Ali 'Imran", englishTranslation: "Family of Imran", totalAyahs: 200, revelationType: .madinah, startPage: 50, juzNumber: 3),
@@ -56,20 +89,4 @@ public final class QuranViewModel {
         SurahMetadata(number: 113, nameArabic: "الفلق", nameEnglish: "Al-Falaq", englishTranslation: "Daybreak", totalAyahs: 5, revelationType: .makkah, startPage: 604, juzNumber: 30),
         SurahMetadata(number: 114, nameArabic: "الناس", nameEnglish: "An-Nas", englishTranslation: "Mankind", totalAyahs: 6, revelationType: .makkah, startPage: 604, juzNumber: 30)
     ]
-    
-    public var filteredSurahs: [SurahMetadata] {
-        if searchText.isEmpty {
-            return surahs
-        } else {
-            return surahs.filter {
-                $0.nameEnglish.localizedCaseInsensitiveContains(searchText) ||
-                $0.nameArabic.contains(searchText) ||
-                "\($0.number)".contains(searchText)
-            }
-        }
-    }
-    
-    public func toggleFeaturedAudio() {
-        isFeaturedPlaying.toggle()
-    }
 }
