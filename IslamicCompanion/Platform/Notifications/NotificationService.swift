@@ -5,18 +5,15 @@ import UserNotifications
 public final class NotificationService {
     public static let shared = NotificationService()
     
-    private let center = UNUserNotificationCenter.current()
-    
     public init() {}
     
     /// Requests notification permissions gracefully from the user.
     @discardableResult
     public func requestAuthorization() async -> Bool {
-        do {
-            let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
-            return granted
-        } catch {
-            return false
+        await withCheckedContinuation { continuation in
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                continuation.resume(returning: granted)
+            }
         }
     }
     
@@ -24,6 +21,7 @@ public final class NotificationService {
     public func schedulePrayerReminders(schedule: PrayerSchedule, prePrayerReminderMinutes: Int = 15) {
         let calendar = Calendar.current
         let now = Date()
+        let center = UNUserNotificationCenter.current()
         
         for item in schedule.times where item.kind.isObligatoryPrayer {
             let id = "deen.prayer.\(item.kind.rawValue.lowercased())"
@@ -71,7 +69,7 @@ public final class NotificationService {
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: qiyamDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         let request = UNNotificationRequest(identifier: "deen.qiyam", content: content, trigger: trigger)
-        center.add(request)
+        UNUserNotificationCenter.current().add(request)
     }
     
     /// Schedules Morning and Evening Adhkar daily recurring reminders.
@@ -81,6 +79,8 @@ public final class NotificationService {
         eveningHour: Int = 17,
         eveningMinute: Int = 0
     ) {
+        let center = UNUserNotificationCenter.current()
+        
         // Morning Adhkar
         var morningComponents = DateComponents()
         morningComponents.hour = morningHour
@@ -112,6 +112,6 @@ public final class NotificationService {
     
     /// Cancels all pending notifications
     public func removeAllPendingReminders() {
-        center.removeAllPendingNotificationRequests()
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
     }
 }
