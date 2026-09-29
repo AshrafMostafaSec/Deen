@@ -29,13 +29,16 @@ public final class TodayViewModel {
     private var lastLongitude: Double = 46.6753
     
     public init() {
-        let schedule = engine.calculateSchedule(
+        let defaultLat = 24.7136
+        let defaultLon = 46.6753
+        self.lastLatitude = defaultLat
+        self.lastLongitude = defaultLon
+        self.prayerSchedule = engine.calculateSchedule(
             date: Date(),
-            latitude: lastLatitude,
-            longitude: lastLongitude,
+            latitude: defaultLat,
+            longitude: defaultLon,
             locationName: "Riyadh, Saudi Arabia"
         )
-        self.prayerSchedule = schedule
         updateCountdownString()
         refreshDateStrings()
     }

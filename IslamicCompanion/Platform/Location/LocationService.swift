@@ -25,7 +25,6 @@ public final class LocationService: NSObject, CLLocationManagerDelegate {
     }
     
     private let locationManager = CLLocationManager()
-    private let geocoder = CLGeocoder()
     private var lastGeocodedLocation: CLLocation?
     private var geocodeTask: Task<Void, Never>?
     private var activeHeadingConsumers: Int = 0
@@ -151,32 +150,35 @@ public final class LocationService: NSObject, CLLocationManagerDelegate {
     // MARK: - Safe Async Reverse Geocoding
     
     private func scheduleReverseGeocode(for location: CLLocation) {
-        // Suppress redundant geocoding if moved less than 2 km and name is already known
         if let lastLocation = lastGeocodedLocation,
            location.distance(from: lastLocation) < 2000,
            self.locationName != Self.fallbackLocationName {
             return
         }
         
+        let lat = location.coordinate.latitude
+        let lon = location.coordinate.longitude
+        
         geocodeTask?.cancel()
         geocodeTask = Task { @MainActor [weak self] in
             guard let self else { return }
+            let loc = CLLocation(latitude: lat, longitude: lon)
             do {
-                let placemarks = try await self.geocoder.reverseGeocodeLocation(location)
+                let localGeocoder = CLGeocoder()
+                let placemarks = try await localGeocoder.reverseGeocodeLocation(loc)
                 if Task.isCancelled { return }
                 
                 if let placemark = placemarks.first {
                     let city = placemark.locality ?? placemark.administrativeArea ?? placemark.subAdministrativeArea ?? "Current Location"
                     let country = placemark.country ?? ""
                     self.locationName = country.isEmpty ? city : "\(city), \(country)"
-                    self.lastGeocodedLocation = location
+                    self.lastGeocodedLocation = loc
                 }
             } catch {
                 if Task.isCancelled { return }
-                // Fallback cleanly when offline so name does not falsely display "Riyadh"
                 if self.locationName == Self.fallbackLocationName {
-                    let formattedLat = String(format: "%.2f°", location.coordinate.latitude)
-                    let formattedLon = String(format: "%.2f°", location.coordinate.longitude)
+                    let formattedLat = String(format: "%.2f°", lat)
+                    let formattedLon = String(format: "%.2f°", lon)
                     self.locationName = "Location (\(formattedLat), \(formattedLon))"
                 }
             }

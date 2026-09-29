@@ -336,11 +336,11 @@ public final class AudioService: NSObject {
     
     @objc nonisolated private func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt else { return }
+        let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt
         
         Task { @MainActor [weak self] in
-            guard let self else { return }
+            guard let self, let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
             switch type {
             case .began:
                 self.wasPlayingBeforeInterruption = self.isPlaying
@@ -348,11 +348,9 @@ public final class AudioService: NSObject {
                 self.playbackState = .paused
                 self.updateNowPlayingPlaybackRate(0.0)
             case .ended:
-                guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
-                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-                if options.contains(.shouldResume) && self.wasPlayingBeforeInterruption {
+                let shouldResume = (optionsValue.flatMap { AVAudioSession.InterruptionOptions(rawValue: $0) })?.contains(.shouldResume) ?? false
+                if shouldResume && self.wasPlayingBeforeInterruption {
                     if self.isLiveRadio {
-                        // Reconnect live stream
                         self.playCurrentStationCandidate()
                     } else {
                         self.activateAudioSession()
@@ -370,12 +368,10 @@ public final class AudioService: NSObject {
     
     @objc nonisolated private func handleRouteChange(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
-              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }
+              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt else { return }
         
         Task { @MainActor [weak self] in
-            guard let self else { return }
-            // Pause playback if headphones/AirPods disconnected
+            guard let self, let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }
             if reason == .oldDeviceUnavailable {
                 if self.isPlaying {
                     self.player?.pause()
