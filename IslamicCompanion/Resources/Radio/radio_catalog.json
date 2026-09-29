@@ -1,29 +1,29 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": "1.0.0",
   "generatedAt": "2026-09-29T00:00:00Z",
   "stations": [
     {
       "id": "quran-radio-cairo",
       "name": "إذاعة القرآن الكريم من القاهرة",
-      "shortName": "Quran Cairo",
+      "shortName": "Quran Cairo 98.2 FM",
       "frequencyMHz": 98.2,
       "category": "quran",
       "countryCode": "EG",
       "city": "Cairo",
-      "isFeatured": true,
-      "isEnabled": true,
       "streamCandidates": [
         {
-          "url": "https://backup.qurango.net/radio/cairo",
+          "url": "https://stream.zeno.fm/f3wvbbqmdg8uv",
           "format": "mp3",
           "priority": 1
         },
         {
-          "url": "https://stream.zeno.fm/f3wvbbqmdg8uv",
+          "url": "https://backup.qurango.net/radio/cairo",
           "format": "mp3",
           "priority": 2
         }
-      ]
+      ],
+      "isFeatured": true,
+      "isEnabled": true
     },
     {
       "id": "el-radio-9090",
@@ -33,15 +33,15 @@
       "category": "general",
       "countryCode": "EG",
       "city": "Cairo",
-      "isFeatured": false,
-      "isEnabled": true,
       "streamCandidates": [
         {
           "url": "https://9090streaming.mobtada.com/9090FMEGYPT",
           "format": "mp3",
           "priority": 1
         }
-      ]
+      ],
+      "isFeatured": false,
+      "isEnabled": true
     },
     {
       "id": "nogoum-fm",
@@ -51,15 +51,15 @@
       "category": "commercial",
       "countryCode": "EG",
       "city": "Cairo",
-      "isFeatured": false,
-      "isEnabled": true,
       "streamCandidates": [
         {
           "url": "https://stream.zeno.fm/qb1zvsykm98uv",
           "format": "mp3",
           "priority": 1
         }
-      ]
+      ],
+      "isFeatured": false,
+      "isEnabled": true
     },
     {
       "id": "radio-hits",
@@ -69,15 +69,15 @@
       "category": "commercial",
       "countryCode": "EG",
       "city": "Cairo",
-      "isFeatured": false,
-      "isEnabled": true,
       "streamCandidates": [
         {
           "url": "https://radiohits882.radioca.st/;",
           "format": "mp3",
           "priority": 1
         }
-      ]
+      ],
+      "isFeatured": false,
+      "isEnabled": true
     },
     {
       "id": "sha3by-fm",
@@ -87,69 +87,76 @@
       "category": "commercial",
       "countryCode": "EG",
       "city": "Cairo",
-      "isFeatured": false,
-      "isEnabled": true,
       "streamCandidates": [
         {
           "url": "https://radio95.radioca.st/;",
           "format": "mp3",
           "priority": 1
         }
-      ]
+      ],
+      "isFeatured": false,
+      "isEnabled": true
     },
     {
       "id": "reciter-hussary",
       "name": "إذاعة الشيخ محمود خليل الحصري (24/7)",
       "shortName": "Al-Hussary 24/7",
-      "frequencyMHz": null,
       "category": "quran",
       "countryCode": "EG",
-      "city": "Tanta",
-      "isFeatured": true,
-      "isEnabled": true,
+      "city": "Cairo",
       "streamCandidates": [
         {
           "url": "https://backup.qurango.net/radio/mahmoud_khalil_alhussary",
           "format": "mp3",
           "priority": 1
         }
-      ]
+      ],
+      "isFeatured": false,
+      "isEnabled": true
     },
     {
       "id": "reciter-minshawi",
       "name": "إذاعة الشيخ محمد صديق المنشاوي (24/7)",
       "shortName": "Al-Minshawi 24/7",
-      "frequencyMHz": null,
       "category": "quran",
       "countryCode": "EG",
-      "city": "Sohag",
-      "isFeatured": true,
-      "isEnabled": true,
+      "city": "Cairo",
       "streamCandidates": [
         {
           "url": "https://backup.qurango.net/radio/mohammed_siddiq_alminshawi",
           "format": "mp3",
           "priority": 1
+        },
+        {
+          "url": "https://stream.zeno.fm/f3wvbbqmdg8uv",
+          "format": "mp3",
+          "priority": 2
         }
-      ]
+      ],
+      "isFeatured": false,
+      "isEnabled": true
     },
     {
       "id": "reciter-abdulbasit",
       "name": "إذاعة الشيخ عبد الباسط عبد الصمد (24/7)",
       "shortName": "Abdulbasit 24/7",
-      "frequencyMHz": null,
       "category": "quran",
       "countryCode": "EG",
-      "city": "Qena",
-      "isFeatured": true,
-      "isEnabled": true,
+      "city": "Cairo",
       "streamCandidates": [
         {
           "url": "https://backup.qurango.net/radio/abdulbasit_abdulsamad_mojawwad",
           "format": "mp3",
           "priority": 1
+        },
+        {
+          "url": "https://stream.zeno.fm/f3wvbbqmdg8uv",
+          "format": "mp3",
+          "priority": 2
         }
-      ]
+      ],
+      "isFeatured": false,
+      "isEnabled": true
     }
   ]
 }

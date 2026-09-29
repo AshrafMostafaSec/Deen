@@ -2,6 +2,8 @@ import SwiftUI
 
 public struct TodayView: View {
     @State private var viewModel = TodayViewModel()
+    @Environment(\.locationService) private var locationService
+    
     public let onNavigateToQuran: () -> Void
     public let onNavigateToAdhkar: () -> Void
     public let onNavigateToPrayer: () -> Void
@@ -19,38 +21,38 @@ public struct TodayView: View {
     public var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: AppSpacing.spaceLg) {
-                // Header (Location, Date, Greeting)
                 headerSection
-                
-                // Hero Astrolabe Next Prayer Card
                 heroNextPrayerCard
-                
-                // Daily 5-Prayer Timeline Bar
                 prayerTimelineSection
-                
-                // Daily Quran Goal Card
                 quranGoalCard
-                
-                // Smart Contextual Adhkar Card
                 adhkarCard
-                
-                // Qiyam Al-Layl Card
+                quranRadioCard
                 qiyamCard
-                
-                // Daily Hadith Card
-                hadithCard
             }
             .padding(.horizontal, AppSpacing.margin)
             .padding(.top, AppSpacing.spaceSm)
-            .padding(.bottom, 120) // Space for floating mini-player & tab bar
+            .padding(.bottom, 170) // Clearance for floating tab bar & mini-player
         }
         .background(AppColor.background.ignoresSafeArea())
         .onAppear {
             viewModel.onAppear()
+            updateFromLocation()
         }
         .onDisappear {
             viewModel.onDisappear()
         }
+        .onChange(of: locationService.latitude) { _, _ in updateFromLocation() }
+        .onChange(of: locationService.longitude) { _, _ in updateFromLocation() }
+        .onChange(of: locationService.locationName) { _, _ in updateFromLocation() }
+        .onChange(of: locationService.isLocationAvailable) { _, _ in updateFromLocation() }
+    }
+    
+    private func updateFromLocation() {
+        viewModel.updateLocation(
+            latitude: locationService.latitude,
+            longitude: locationService.longitude,
+            name: locationService.locationName
+        )
     }
     
     // MARK: - Sections
@@ -71,7 +73,7 @@ public struct TodayView: View {
                     .font(AppFont.interfaceLabel(size: 12))
                     .foregroundColor(AppColor.tertiary)
                 
-                Text("Assalamu Alaikum, \(viewModel.greetingName)")
+                Text("Assalamu Alaikum")
                     .font(AppFont.interface(size: 18, weight: .semibold))
                     .foregroundColor(AppColor.onSurface)
                     .padding(.top, 2)
@@ -79,15 +81,17 @@ public struct TodayView: View {
             
             Spacer()
             
-            // Profile / Settings Avatar icon
-            Circle()
-                .fill(AppColor.primary)
-                .frame(width: 36, height: 36)
-                .overlay {
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(AppColor.onPrimary)
-                }
+            // Settings button
+            Button {
+                onNavigateToPrayer()
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 15))
+                    .foregroundColor(AppColor.secondary)
+                    .frame(width: 36, height: 36)
+                    .background(Circle().fill(AppColor.surfaceContainerHigh))
+            }
+            .buttonStyle(.plain)
         }
         .padding(.top, 8)
     }
@@ -105,17 +109,13 @@ public struct TodayView: View {
                 
                 Spacer()
                 
-                HStack(spacing: 5) {
-                    Image(systemName: "sun.horizon.fill")
-                        .font(.system(size: 12))
-                    Text("Sunrise 06:05 AM")
-                        .font(AppFont.technicalMetric(size: 11))
-                }
-                .foregroundColor(AppColor.tertiary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(AppColor.tertiaryContainer.opacity(0.45))
-                .clipShape(Capsule())
+                Text("LIVE")
+                    .font(AppFont.technicalMetric(size: 10, weight: .bold))
+                    .foregroundColor(AppColor.error)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(AppColor.errorContainer.opacity(0.35))
+                    .clipShape(Capsule())
             }
             
             HStack(alignment: .lastTextBaseline) {
@@ -124,7 +124,7 @@ public struct TodayView: View {
                         .font(AppFont.celestialDisplay(size: 40))
                         .foregroundColor(AppColor.onSurface)
                     
-                    Text("Umm Al-Qura Calendar Calculation")
+                    Text(viewModel.prayerSchedule.calculationMethod.rawValue)
                         .font(AppFont.interface(size: 12))
                         .foregroundColor(AppColor.onSurfaceVariant)
                 }
@@ -146,22 +146,25 @@ public struct TodayView: View {
                 }
             }
             
-            // Solar Arc Visualization Track
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(AppColor.surfaceContainerLowest)
-                    .frame(height: 6)
-                
-                Capsule()
-                    .fill(
-                        LinearGradient(
-                            colors: [AppColor.primaryContainer, AppColor.primary],
-                            startPoint: .leading,
-                            endPoint: .trailing
+            // Solar Arc Progress
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(AppColor.surfaceContainerLowest)
+                        .frame(height: 6)
+                    
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [AppColor.primaryContainer, AppColor.primary],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
-                    )
-                    .frame(width: 140, height: 6)
+                        .frame(width: max(0, min(geo.size.width, geo.size.width * solarAltitudeProgress)), height: 6)
+                }
             }
+            .frame(height: 6)
             .padding(.top, 4)
         }
         .padding(AppSpacing.spaceLg)
@@ -171,6 +174,13 @@ public struct TodayView: View {
         }
     }
     
+    /// Maps solar altitude angle (-90° to +90°) into 0.0 - 1.0 progress
+    private var solarAltitudeProgress: CGFloat {
+        let angle = viewModel.prayerSchedule.solarAltitudeAngle
+        let normalized = (angle + 90.0) / 180.0
+        return CGFloat(max(0.05, min(0.95, normalized)))
+    }
+    
     private var prayerTimelineSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.spaceSm) {
             HStack {
@@ -178,9 +188,12 @@ public struct TodayView: View {
                     .font(AppFont.interfaceLabel(size: 14, weight: .semibold))
                     .foregroundColor(AppColor.onSurface)
                 Spacer()
-                Text("View Full Schedule")
-                    .font(AppFont.interfaceLabel(size: 12))
-                    .foregroundColor(AppColor.primary)
+                Button(action: onNavigateToPrayer) {
+                    Text("View Full Schedule")
+                        .font(AppFont.interfaceLabel(size: 12))
+                        .foregroundColor(AppColor.primary)
+                }
+                .buttonStyle(.plain)
             }
             
             HStack(spacing: 8) {
@@ -195,7 +208,7 @@ public struct TodayView: View {
                             .font(.system(size: 15))
                             .foregroundColor(isNext ? AppColor.primary : AppColor.secondary.opacity(0.7))
                         
-                        Text(item.formattedTime.replacingOccurrences(of: " AM", with: "").replacingOccurrences(of: " PM", with: ""))
+                        Text(shortTime(item.formattedTime))
                             .font(AppFont.technicalMetric(size: 11))
                             .foregroundColor(isNext ? AppColor.onSurface : AppColor.onSurfaceVariant)
                     }
@@ -214,6 +227,10 @@ public struct TodayView: View {
                 }
             }
         }
+    }
+    
+    private func shortTime(_ time: String) -> String {
+        time.replacingOccurrences(of: " AM", with: "").replacingOccurrences(of: " PM", with: "")
     }
     
     private var quranGoalCard: some View {
@@ -269,7 +286,7 @@ public struct TodayView: View {
                 Text(viewModel.adhkarTitle)
                     .font(AppFont.interfaceLabel(size: 14, weight: .semibold))
                     .foregroundColor(AppColor.onSurface)
-                Text("\(viewModel.adhkarCompleted) of \(viewModel.adhkarTotal) Completed Today")
+                Text("\(viewModel.adhkarCompleted) of \(viewModel.adhkarTotal) Completed")
                     .font(AppFont.interface(size: 11))
                     .foregroundColor(AppColor.onSurfaceVariant)
             }
@@ -283,6 +300,60 @@ public struct TodayView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 7)
                     .background(Capsule().fill(AppColor.primary))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(AppSpacing.spaceMd)
+        .astrolabeGlass(cornerRadius: AppRadius.card)
+    }
+    
+    private var quranRadioCard: some View {
+        let isPlayingRadio = AudioService.shared.isLiveRadio && AudioService.shared.isPlaying
+        
+        return HStack(spacing: AppSpacing.spaceMd) {
+            ZStack {
+                Circle()
+                    .fill(AppColor.primaryContainer.opacity(0.8))
+                    .frame(width: 48, height: 48)
+                Image(systemName: "dot.radiowaves.left.and.right")
+                    .font(.system(size: 20))
+                    .foregroundColor(AppColor.primary)
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 5) {
+                    Text("Quran Radio Cairo")
+                        .font(AppFont.interfaceLabel(size: 14, weight: .semibold))
+                        .foregroundColor(AppColor.onSurface)
+                    
+                    Text("98.2 FM")
+                        .font(AppFont.technicalMetric(size: 11, weight: .bold))
+                        .foregroundColor(AppColor.tertiary)
+                }
+                
+                Text("إذاعة القرآن الكريم من القاهرة • Live")
+                    .font(AppFont.interface(size: 11))
+                    .foregroundColor(AppColor.onSurfaceVariant)
+            }
+            
+            Spacer()
+            
+            Button {
+                if isPlayingRadio {
+                    AudioService.shared.togglePlayPause()
+                } else {
+                    let cairoStation = RadioViewModel.fallbackStations.first(where: { $0.id == "quran-radio-cairo" }) ?? RadioViewModel.fallbackStations[0]
+                    AudioService.shared.playRadio(station: cairoStation)
+                }
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(AppColor.primary)
+                        .frame(width: 36, height: 36)
+                    Image(systemName: isPlayingRadio ? "pause.fill" : "play.fill")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(AppColor.onPrimary)
+                }
             }
             .buttonStyle(.plain)
         }
@@ -322,32 +393,6 @@ public struct TodayView: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(AppSpacing.spaceMd)
-        .astrolabeGlass(cornerRadius: AppRadius.card)
-    }
-    
-    private var hadithCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 5) {
-                Image(systemName: "quote.opening")
-                    .font(.system(size: 12))
-                    .foregroundColor(AppColor.primary)
-                Text("Hadith of the Day")
-                    .font(AppFont.interfaceLabel(size: 12, weight: .semibold))
-                    .foregroundColor(AppColor.secondary)
-            }
-            
-            Text(viewModel.dailyHadithText)
-                .font(AppFont.quranScripture(size: 17))
-                .foregroundColor(AppColor.onSurface)
-                .multilineTextAlignment(.leading)
-                .padding(.vertical, 2)
-            
-            Text(viewModel.dailyHadithSource)
-                .font(AppFont.interface(size: 11))
-                .foregroundColor(AppColor.onSurfaceVariant)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppSpacing.spaceMd)
         .astrolabeGlass(cornerRadius: AppRadius.card)
     }

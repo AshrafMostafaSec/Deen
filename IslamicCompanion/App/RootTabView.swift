@@ -4,7 +4,7 @@ public struct RootTabView: View {
     @State private var selectedTab: NavigationTab = .today
     @State private var isRadioSheetPresented: Bool = false
     
-    // Connect to shared audio service
+    // Connect to shared services
     private var audioService = AudioService.shared
     
     public init() {}
@@ -53,13 +53,19 @@ public struct RootTabView: View {
                             }
                         }
                     )
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(
+                        .asymmetric(
+                            insertion: .move(edge: .bottom).combined(with: .opacity).combined(with: .scale(scale: 0.95, anchor: .bottom)),
+                            removal: .move(edge: .bottom).combined(with: .opacity).combined(with: .scale(scale: 0.95, anchor: .bottom))
+                        )
+                    )
                 }
                 
                 // Floating Bottom Tab Bar
                 FloatingTabBar(selectedTab: $selectedTab)
             }
-            .padding(.bottom, 24)
+            .padding(.bottom, 8)
+            .animation(.spring(response: 0.38, dampingFraction: 0.82), value: !audioService.currentTitle.isEmpty)
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .sheet(isPresented: $isRadioSheetPresented) {

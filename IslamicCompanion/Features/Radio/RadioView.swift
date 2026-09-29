@@ -45,7 +45,7 @@ public struct RadioView: View {
     // MARK: - Sections
     
     private func featuredStationCard(_ station: RadioStation) -> some View {
-        let isCurrent = AudioService.shared.currentTitle == station.name && AudioService.shared.isPlaying
+        let isCurrent = viewModel.isStationPlaying(station)
         
         return VStack(spacing: AppSpacing.spaceMd) {
             HStack {
@@ -94,11 +94,7 @@ public struct RadioView: View {
                 Spacer()
                 
                 Button {
-                    if isCurrent {
-                        AudioService.shared.togglePlayPause()
-                    } else {
-                        AudioService.shared.playRadio(station: station)
-                    }
+                    viewModel.playOrToggle(station: station)
                 } label: {
                     ZStack {
                         Circle()
@@ -132,9 +128,15 @@ public struct RadioView: View {
     
     private var recitersChannelsSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.spaceSm) {
-            Text("24/7 Live Reciters (إذاعات كبار القراء)")
-                .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
-                .foregroundColor(AppColor.onSurface)
+            HStack {
+                Text("24/7 Live Reciters")
+                    .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
+                    .foregroundColor(AppColor.onSurface)
+                Spacer()
+                Text("Cairo Reciters")
+                    .font(AppFont.interfaceLabel(size: 12))
+                    .foregroundColor(AppColor.secondary)
+            }
             
             VStack(spacing: 8) {
                 ForEach(viewModel.generalStations.filter { $0.category == .quran }) { station in
@@ -145,7 +147,7 @@ public struct RadioView: View {
     }
     
     private func stationRow(_ station: RadioStation) -> some View {
-        let isCurrent = AudioService.shared.currentTitle == station.name && AudioService.shared.isPlaying
+        let isCurrent = viewModel.isStationPlaying(station)
         
         return HStack(spacing: AppSpacing.spaceMd) {
             ZStack {
@@ -170,11 +172,7 @@ public struct RadioView: View {
             Spacer()
             
             Button {
-                if isCurrent {
-                    AudioService.shared.togglePlayPause()
-                } else {
-                    AudioService.shared.playRadio(station: station)
-                }
+                viewModel.playOrToggle(station: station)
             } label: {
                 ZStack {
                     Circle()

@@ -21,3 +21,15 @@ public final class AppEnvironment {
         self.notificationService = notificationService
     }
 }
+
+/// EnvironmentKey to inject LocationService into the SwiftUI environment
+private struct LocationServiceKey: EnvironmentKey {
+    static let defaultValue: LocationService? = nil
+}
+
+public extension EnvironmentValues {
+    var locationService: LocationService {
+        get { self[LocationServiceKey.self] ?? AppEnvironment.shared.locationService }
+        set { self[LocationServiceKey.self] = newValue }
+    }
+}

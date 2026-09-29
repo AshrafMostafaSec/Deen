@@ -21,12 +21,19 @@ public struct QuranHomeView: View {
                 // Featured Recitation Card
                 featuredAudioCard
                 
-                // Surah Index List
-                surahsListSection
+                // Content Switcher based on Tab Filter
+                switch viewModel.selectedFilter {
+                case .surahs:
+                    surahsListSection
+                case .juz:
+                    juzListSection
+                case .bookmarks:
+                    bookmarksSection
+                }
             }
             .padding(.horizontal, AppSpacing.margin)
             .padding(.top, AppSpacing.spaceSm)
-            .padding(.bottom, 120)
+            .padding(.bottom, 170) // Clearance for floating tab bar & mini-player
         }
         .background(AppColor.background.ignoresSafeArea())
         .sheet(item: $selectedSurahForReading) { surah in
@@ -49,17 +56,6 @@ public struct QuranHomeView: View {
                 }
                 
                 Spacer()
-                
-                Button {
-                    // Reciter selection sheet
-                } label: {
-                    Image(systemName: "mic.fill")
-                        .font(.system(size: 15))
-                        .foregroundColor(AppColor.primary)
-                        .frame(width: 36, height: 36)
-                        .background(Circle().fill(AppColor.surfaceContainerHigh))
-                }
-                .buttonStyle(.plain)
             }
             
             // Search Bar
@@ -101,7 +97,7 @@ public struct QuranHomeView: View {
                     Image(systemName: "bookmark.fill")
                         .foregroundColor(AppColor.tertiary)
                         .font(.system(size: 12))
-                    Text("Last Reading Position • 2 hours ago")
+                    Text("Last Reading Position")
                         .font(AppFont.interfaceLabel(size: 12))
                         .foregroundColor(AppColor.tertiary)
                 }
@@ -136,7 +132,7 @@ public struct QuranHomeView: View {
                 Spacer()
                 
                 Button {
-                    selectedSurahForReading = viewModel.filteredSurahs.first(where: { $0.number == 2 }) ?? viewModel.filteredSurahs.first
+                    selectedSurahForReading = viewModel.filteredSurahs.first(where: { $0.number == 18 }) ?? viewModel.filteredSurahs.first
                 } label: {
                     HStack(spacing: 5) {
                         Image(systemName: "book.fill")
@@ -216,7 +212,7 @@ public struct QuranHomeView: View {
                 Text(viewModel.featuredReciterName)
                     .font(AppFont.interfaceLabel(size: 13, weight: .semibold))
                     .foregroundColor(AppColor.onSurface)
-                Text("\(viewModel.featuredSurahName) • HQ Studio Recitation")
+                Text("\(viewModel.featuredSurahName) • EveryAyah Audio")
                     .font(AppFont.interface(size: 11))
                     .foregroundColor(AppColor.onSurfaceVariant)
             }
@@ -248,7 +244,7 @@ public struct QuranHomeView: View {
                     .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
                     .foregroundColor(AppColor.onSurface)
                 Spacer()
-                Text("114 Surahs")
+                Text("\(viewModel.filteredSurahs.count) Surahs")
                     .font(AppFont.technicalMetric(size: 12))
                     .foregroundColor(AppColor.secondary)
             }
@@ -314,5 +310,79 @@ public struct QuranHomeView: View {
                 }
             }
         }
+    }
+    
+    private var juzListSection: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.spaceSm) {
+            Text("The 30 Parts (الأجزاء الثلاثون)")
+                .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
+                .foregroundColor(AppColor.onSurface)
+            
+            LazyVStack(spacing: 8) {
+                ForEach(viewModel.juzList) { juz in
+                    HStack(spacing: AppSpacing.spaceMd) {
+                        ZStack {
+                            Circle()
+                                .fill(AppColor.surfaceContainerHighest)
+                                .frame(width: 36, height: 36)
+                            Text("\(juz.number)")
+                                .font(AppFont.technicalMetric(size: 13, weight: .semibold))
+                                .foregroundColor(AppColor.primary)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Juz \(juz.number)")
+                                .font(AppFont.interfaceLabel(size: 15, weight: .semibold))
+                                .foregroundColor(AppColor.onSurface)
+                            Text("Starts at Page \(juz.startPage)")
+                                .font(AppFont.interface(size: 11))
+                                .foregroundColor(AppColor.onSurfaceVariant)
+                        }
+                        
+                        Spacer()
+                        
+                        Text(juz.nameArabic)
+                            .font(AppFont.arabicHeading(size: 16))
+                            .foregroundColor(AppColor.secondary)
+                    }
+                    .padding(.horizontal, AppSpacing.spaceMd)
+                    .padding(.vertical, 12)
+                    .background {
+                        RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                            .fill(AppColor.surfaceContainerLow)
+                    }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
+                            .strokeBorder(AppColor.hairlineBorder, lineWidth: 1)
+                    }
+                }
+            }
+        }
+    }
+    
+    private var bookmarksSection: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "bookmark")
+                .font(.system(size: 36))
+                .foregroundColor(AppColor.tertiary)
+                .padding(.top, 24)
+            Text("Current Bookmark: Surah Al-Kahf • Page 293")
+                .font(AppFont.interfaceLabel(size: 14))
+                .foregroundColor(AppColor.onSurface)
+            Button {
+                selectedSurahForReading = viewModel.filteredSurahs.first(where: { $0.number == 18 })
+            } label: {
+                Text("Open Bookmarked Page")
+                    .font(AppFont.interfaceLabel(size: 13, weight: .semibold))
+                    .foregroundColor(AppColor.onPrimary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Capsule().fill(AppColor.primary))
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .astrolabeGlass(cornerRadius: AppRadius.card)
     }
 }

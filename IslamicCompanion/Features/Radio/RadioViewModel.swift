@@ -9,13 +9,16 @@ public final class RadioViewModel {
     public var isLoading: Bool = false
     public var errorMessage: String? = nil
     
+    // Current playback state from AudioService
+    public var currentPlayingTitle: String { AudioService.shared.currentTitle }
+    public var isCurrentPlaying: Bool { AudioService.shared.isPlaying }
+    
     public init() {
         loadCatalog()
     }
     
     public func loadCatalog() {
         guard let url = Bundle.main.url(forResource: "radio_catalog", withExtension: "json") else {
-            // Fallback hardcoded verified stations if bundle resource not yet linked
             self.stations = Self.fallbackStations
             return
         }
@@ -37,6 +40,18 @@ public final class RadioViewModel {
         stations.filter { $0.id != featuredStation?.id }
     }
     
+    public func isStationPlaying(_ station: RadioStation) -> Bool {
+        AudioService.shared.currentTitle == station.name && AudioService.shared.isPlaying
+    }
+    
+    public func playOrToggle(station: RadioStation) {
+        if isStationPlaying(station) {
+            AudioService.shared.togglePlayPause()
+        } else {
+            AudioService.shared.playRadio(station: station)
+        }
+    }
+    
     public static let fallbackStations: [RadioStation] = {
         func safeURL(_ str: String) -> URL {
             URL(string: str) ?? URL(fileURLWithPath: "/")
@@ -50,8 +65,8 @@ public final class RadioViewModel {
                 frequencyMHz: 98.2,
                 category: .quran,
                 streamCandidates: [
-                    RadioStreamCandidate(url: safeURL("https://backup.qurango.net/radio/cairo"), format: .mp3, priority: 1),
-                    RadioStreamCandidate(url: safeURL("https://stream.zeno.fm/f3wvbbqmdg8uv"), format: .mp3, priority: 2)
+                    RadioStreamCandidate(url: safeURL("https://stream.zeno.fm/f3wvbbqmdg8uv"), format: .mp3, priority: 1),
+                    RadioStreamCandidate(url: safeURL("https://backup.qurango.net/radio/cairo"), format: .mp3, priority: 2)
                 ],
                 isFeatured: true
             ),
@@ -110,7 +125,8 @@ public final class RadioViewModel {
                 shortName: "Al-Minshawi 24/7",
                 category: .quran,
                 streamCandidates: [
-                    RadioStreamCandidate(url: safeURL("https://backup.qurango.net/radio/mohammed_siddiq_alminshawi"), format: .mp3, priority: 1)
+                    RadioStreamCandidate(url: safeURL("https://backup.qurango.net/radio/mohammed_siddiq_alminshawi"), format: .mp3, priority: 1),
+                    RadioStreamCandidate(url: safeURL("https://stream.zeno.fm/f3wvbbqmdg8uv"), format: .mp3, priority: 2)
                 ]
             ),
             RadioStation(
@@ -119,7 +135,8 @@ public final class RadioViewModel {
                 shortName: "Abdulbasit 24/7",
                 category: .quran,
                 streamCandidates: [
-                    RadioStreamCandidate(url: safeURL("https://backup.qurango.net/radio/abdulbasit_abdulsamad_mojawwad"), format: .mp3, priority: 1)
+                    RadioStreamCandidate(url: safeURL("https://backup.qurango.net/radio/abdulbasit_abdulsamad_mojawwad"), format: .mp3, priority: 1),
+                    RadioStreamCandidate(url: safeURL("https://stream.zeno.fm/f3wvbbqmdg8uv"), format: .mp3, priority: 2)
                 ]
             )
         ]

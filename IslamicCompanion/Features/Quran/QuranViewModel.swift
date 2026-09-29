@@ -1,7 +1,7 @@
 import SwiftUI
 import Observation
 
-public enum QuranTabFilter: String, CaseIterable, Identifiable {
+public enum QuranTabFilter: String, CaseIterable, Identifiable, Sendable {
     case surahs = "Surahs"
     case juz = "Juz"
     case bookmarks = "Bookmarks"
@@ -17,6 +17,14 @@ public enum QuranTabFilter: String, CaseIterable, Identifiable {
     }
 }
 
+public struct JuzItem: Identifiable, Sendable {
+    public var id: Int { number }
+    public let number: Int
+    public let nameArabic: String
+    public let startingSurahName: String
+    public let startPage: Int
+}
+
 @MainActor
 @Observable
 public final class QuranViewModel {
@@ -24,19 +32,29 @@ public final class QuranViewModel {
     public var searchText: String = ""
     
     // Last read bookmark
-    public var lastReadSurah: String = "Al-Baqarah"
-    public var lastReadSurahArabic: String = "سورة البقرة"
-    public var lastReadPage: Int = 28
-    public var lastReadJuz: Int = 2
-    public var lastReadAyah: Int = 183
-    public var overallProgressPercentage: Int = 5
+    public var lastReadSurah: String = "Al-Kahf"
+    public var lastReadSurahArabic: String = "سورة الكهف"
+    public var lastReadPage: Int = 293
+    public var lastReadJuz: Int = 15
+    public var lastReadAyah: Int = 1
+    public var overallProgressPercentage: Int = 12
     
     // Active Audio highlight
     public var featuredReciterName: String = "Mishary Rashid Al-Afasy"
     public var featuredSurahName: String = "Surah Al-Kahf"
-    public var isFeaturedPlaying: Bool = false
+    
+    public var isFeaturedPlaying: Bool {
+        if case .quran(let surahName, _, _) = AudioService.shared.currentSource {
+            return surahName.contains("Al-Kahf") && AudioService.shared.isPlaying
+        }
+        return false
+    }
     
     public private(set) var surahs: [SurahMetadata] = []
+    
+    public let juzList: [JuzItem] = (1...30).map { i in
+        JuzItem(number: i, nameArabic: "الجزء \(i)", startingSurahName: i == 1 ? "Al-Fatihah" : "Juz \(i)", startPage: (i - 1) * 20 + 2)
+    }
     
     public init() {
         self.surahs = Self.loadSurahs()
@@ -57,19 +75,44 @@ public final class QuranViewModel {
         if searchText.isEmpty {
             return surahs
         } else {
+            let normalizedQuery = normalizeArabic(searchText.lowercased())
             return surahs.filter {
                 $0.nameEnglish.localizedCaseInsensitiveContains(searchText) ||
-                $0.nameArabic.contains(searchText) ||
+                normalizeArabic($0.nameArabic).contains(normalizedQuery) ||
                 "\($0.number)".contains(searchText)
             }
         }
     }
     
     public func toggleFeaturedAudio() {
-        isFeaturedPlaying.toggle()
+        if isFeaturedPlaying {
+            AudioService.shared.togglePlayPause()
+        } else {
+            if let url = URL(string: "https://everyayah.com/data/Alafasy_128kbps/018001.mp3") {
+                AudioService.shared.playQuranAudio(
+                    surahName: "Surah Al-Kahf",
+                    reciterName: featuredReciterName,
+                    audioURL: url,
+                    ayahNumber: 1
+                )
+            }
+        }
     }
     
-    public static let fallbackSurahs: [SurahMetadata] = [
+    private func normalizeArabic(_ text: String) -> String {
+        var str = text
+        let map: [(String, String)] = [
+            ("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ٱ", "ا"),
+            ("ة", "ه"), ("ى", "ي"),
+            ("َ", ""), ("ُ", ""), ("ِ", ""), ("ً", ""), ("ٌ", ""), ("ٍ", ""), ("ّ", ""), ("ْ", "")
+        ]
+        for (from, to) in map {
+            str = str.replacingOccurrences(of: from, with: to)
+        }
+        return str
+    }
+    
+    nonisolated public static let fallbackSurahs: [SurahMetadata] = [
         SurahMetadata(number: 1, nameArabic: "الفاتحة", nameEnglish: "Al-Fatihah", englishTranslation: "The Opening", totalAyahs: 7, revelationType: .makkah, startPage: 1, juzNumber: 1),
         SurahMetadata(number: 2, nameArabic: "البقرة", nameEnglish: "Al-Baqarah", englishTranslation: "The Cow", totalAyahs: 286, revelationType: .madinah, startPage: 2, juzNumber: 1),
         SurahMetadata(number: 3, nameArabic: "آل عمران", nameEnglish: "Ali 'Imran", englishTranslation: "Family of Imran", totalAyahs: 200, revelationType: .madinah, startPage: 50, juzNumber: 3),

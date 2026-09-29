@@ -72,6 +72,11 @@ public final class NotificationService: Sendable {
         UNUserNotificationCenter.current().add(request)
     }
     
+    /// Cancels Qiyam Al-Layl reminder
+    public func cancelQiyamReminder() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["deen.qiyam"])
+    }
+    
     /// Schedules Morning and Evening Adhkar daily recurring reminders.
     public func scheduleDailyAdhkarReminders(
         morningHour: Int = 6,

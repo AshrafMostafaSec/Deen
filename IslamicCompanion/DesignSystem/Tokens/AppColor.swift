@@ -39,6 +39,12 @@ public enum AppColor {
     public static let outline = Color(hex: "#8A938C")
     public static let outlineVariant = Color(hex: "#414943")
     
+    // Error / Live Indicator & Alert - Coral Glow (WCAG AAA compliant on dark)
+    public static let error = Color(hex: "#FFB4AB")
+    public static let onError = Color(hex: "#690005")
+    public static let errorContainer = Color(hex: "#93000A")
+    public static let onErrorContainer = Color(hex: "#FFDAD6")
+    
     // Precision Astrolabe Rim & Highlights
     public static let hairlineBorder = Color.white.opacity(0.08)
     public static let specularGlow = Color(hex: "#2A5C43").opacity(0.35)

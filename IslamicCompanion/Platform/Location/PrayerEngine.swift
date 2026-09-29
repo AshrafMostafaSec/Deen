@@ -2,7 +2,7 @@ import Foundation
 
 /// Pure astronomical calculation engine for prayer times and Qibla bearing
 public struct PrayerEngine: Sendable {
-    // Kaaba Coordinates
+    // Kaaba Coordinates (Makkah, Saudi Arabia)
     public static let kaabaLatitude: Double = 21.422487
     public static let kaabaLongitude: Double = 39.826206
     
@@ -18,18 +18,22 @@ public struct PrayerEngine: Sendable {
         madhab: Madhab = .shafii,
         locationName: String = "Current Location"
     ) -> PrayerSchedule {
-        let calendar = Calendar(identifier: .gregorian)
-        var components = calendar.dateComponents(in: timeZone, from: date)
-        components.hour = 12
-        components.minute = 0
-        components.second = 0
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+        let startOfDay = calendar.startOfDay(for: date)
         
+        let components = calendar.dateComponents([.year, .month, .day], from: startOfDay)
         let year = Double(components.year ?? 2026)
         let month = Double(components.month ?? 3)
         let day = Double(components.day ?? 22)
         
-        // 1. Julian Date at Noon UTC
-        let jd = julianDate(year: year, month: month, day: day)
+        // Timezone offset in hours on this day
+        let tzOffsetSeconds = Double(timeZone.secondsFromGMT(for: date))
+        let tzOffsetHours = tzOffsetSeconds / 3600.0
+        
+        // 1. Julian Date at local solar noon (approx 12:00 local time = 12 - tzOffset in UTC)
+        let dayFraction = (12.0 - tzOffsetHours) / 24.0
+        let jd = julianDate(year: year, month: month, day: day + dayFraction)
         let t = (jd - 2451545.0) / 36525.0
         
         // 2. Solar Position
@@ -37,44 +41,45 @@ public struct PrayerEngine: Sendable {
         let declination = solar.declination
         let eqOfTime = solar.equationOfTime // in minutes
         
-        // 3. Solar Noon (Dhuhr in UTC hours)
-        let dhuhrUtcHours = 12.0 - (longitude / 15.0) - (eqOfTime / 60.0)
+        // 3. Solar Noon (Dhuhr in local standard hours)
+        let dhuhrLocalHours = 12.0 + tzOffsetHours - (longitude / 15.0) - (eqOfTime / 60.0)
         
-        // 4. Sunrise & Sunset (-0.833° altitude for atmospheric refraction & solar disc)
+        // 4. Sunrise & Sunset (-0.8333° altitude for atmospheric refraction & solar disc)
         let sunriseAngle = -0.8333
         let sunriseHourAngle = hourAngle(altitude: sunriseAngle, latitude: latitude, declination: declination)
-        let sunriseUtcHours = dhuhrUtcHours - (sunriseHourAngle / 15.0)
-        let sunsetUtcHours = dhuhrUtcHours + (sunriseHourAngle / 15.0)
+        let sunriseLocalHours = dhuhrLocalHours - (sunriseHourAngle / 15.0)
+        let sunsetLocalHours = dhuhrLocalHours + (sunriseHourAngle / 15.0)
         
         // 5. Fajr
         let fajrHourAngle = hourAngle(altitude: -method.fajrAngle, latitude: latitude, declination: declination)
-        let fajrUtcHours = dhuhrUtcHours - (fajrHourAngle / 15.0)
+        let fajrLocalHours = dhuhrLocalHours - (fajrHourAngle / 15.0)
         
         // 6. Asr
         let shadowFactor = madhab.shadowFactor
         let latDiff = abs(latitude.toRadians() - declination.toRadians())
-        let asrAltRadians = atan(1.0 / (shadowFactor + tan(latDiff)))
+        let clampedLatDiff = min(latDiff, 89.9.toRadians())
+        let asrAltRadians = atan(1.0 / (shadowFactor + tan(clampedLatDiff)))
         let asrAltitude = asrAltRadians.toDegrees()
         let asrHourAngle = hourAngle(altitude: asrAltitude, latitude: latitude, declination: declination)
-        let asrUtcHours = dhuhrUtcHours + (asrHourAngle / 15.0)
+        let asrLocalHours = dhuhrLocalHours + (asrHourAngle / 15.0)
         
         // 7. Isha
-        let ishaUtcHours: Double
+        let ishaLocalHours: Double
         if method == .ummAlQura {
             // Umm Al-Qura uses Maghrib + 90 minutes (1.5 hours)
-            ishaUtcHours = sunsetUtcHours + 1.5
+            ishaLocalHours = sunsetLocalHours + 1.5
         } else {
             let ishaHourAngle = hourAngle(altitude: -method.ishaAngle, latitude: latitude, declination: declination)
-            ishaUtcHours = dhuhrUtcHours + (ishaHourAngle / 15.0)
+            ishaLocalHours = dhuhrLocalHours + (ishaHourAngle / 15.0)
         }
         
-        // Convert UTC hours to local Dates
-        let fajrDate = dateFromUtcHours(fajrUtcHours, on: components, timeZone: timeZone)
-        let sunriseDate = dateFromUtcHours(sunriseUtcHours, on: components, timeZone: timeZone)
-        let dhuhrDate = dateFromUtcHours(dhuhrUtcHours, on: components, timeZone: timeZone)
-        let asrDate = dateFromUtcHours(asrUtcHours, on: components, timeZone: timeZone)
-        let maghribDate = dateFromUtcHours(sunsetUtcHours, on: components, timeZone: timeZone)
-        let ishaDate = dateFromUtcHours(ishaUtcHours, on: components, timeZone: timeZone)
+        // Convert local hours into Dates relative to startOfDay
+        let fajrDate = startOfDay.addingTimeInterval(fajrLocalHours * 3600.0)
+        let sunriseDate = startOfDay.addingTimeInterval(sunriseLocalHours * 3600.0)
+        let dhuhrDate = startOfDay.addingTimeInterval(dhuhrLocalHours * 3600.0)
+        let asrDate = startOfDay.addingTimeInterval(asrLocalHours * 3600.0)
+        let maghribDate = startOfDay.addingTimeInterval(sunsetLocalHours * 3600.0)
+        let ishaDate = startOfDay.addingTimeInterval(ishaLocalHours * 3600.0)
         
         let formatter = DateFormatter()
         formatter.timeZone = timeZone
@@ -92,7 +97,7 @@ public struct PrayerEngine: Sendable {
         
         // Determine Next Prayer and Countdown
         let now = date
-        var chosenNext: PrayerTimeItem = items[0] // fallback to Fajr
+        var chosenNext: PrayerTimeItem?
         var countdownSeconds: Int = 0
         var foundNext = false
         
@@ -111,8 +116,15 @@ public struct PrayerEngine: Sendable {
         
         if !foundNext {
             // Next is tomorrow's Fajr
-            chosenNext = items[0]
-            countdownSeconds = max(0, Int(items[0].date.addingTimeInterval(86400).timeIntervalSince(now)))
+            let tomorrowFajrDate = fajrDate.addingTimeInterval(86400)
+            chosenNext = PrayerTimeItem(
+                kind: .fajr,
+                date: tomorrowFajrDate,
+                formattedTime: items.first?.formattedTime ?? "04:30 AM",
+                isPassed: false,
+                isCurrentOrNext: true
+            )
+            countdownSeconds = max(0, Int(tomorrowFajrDate.timeIntervalSince(now)))
         }
         
         let currentSolarAltitude = calculateSolarAltitude(now: now, latitude: latitude, longitude: longitude)
@@ -122,7 +134,7 @@ public struct PrayerEngine: Sendable {
             locationName: locationName,
             calculationMethod: method,
             times: updatedItems,
-            nextPrayer: chosenNext,
+            nextPrayer: chosenNext ?? items.first ?? PrayerTimeItem(kind: .fajr, date: date, formattedTime: "--:--"),
             nextPrayerCountdownSeconds: countdownSeconds,
             solarAltitudeAngle: currentSolarAltitude
         )
@@ -131,13 +143,15 @@ public struct PrayerEngine: Sendable {
     /// Calculate Qiyam Al-Layl & Last Third schedule
     public func calculateQiyam(
         sunset: Date,
-        fajrNextDay: Date
+        fajrNextDay: Date,
+        timeZone: TimeZone = .current
     ) -> QiyamSchedule {
         let nightDuration = fajrNextDay.timeIntervalSince(sunset)
         let midnight = sunset.addingTimeInterval(nightDuration / 2.0)
         let lastThirdStart = fajrNextDay.addingTimeInterval(-(nightDuration / 3.0))
         
         let formatter = DateFormatter()
+        formatter.timeZone = timeZone
         formatter.dateFormat = "hh:mm a"
         formatter.locale = Locale(identifier: "en_US")
         
@@ -223,14 +237,16 @@ public struct PrayerEngine: Sendable {
         let yearVal = Double(comps.year ?? 2026)
         let monthVal = Double(comps.month ?? 3)
         let dayVal = Double(comps.day ?? 22)
-        let jd = julianDate(year: yearVal, month: monthVal, day: dayVal)
-        let t = (jd - 2451545.0) / 36525.0
-        let solar = solarCoordinates(t: t)
         
         let hourVal = Double(comps.hour ?? 0)
         let minVal = Double(comps.minute ?? 0) / 60.0
         let secVal = Double(comps.second ?? 0) / 3600.0
         let utcHours = hourVal + minVal + secVal
+        
+        let jd = julianDate(year: yearVal, month: monthVal, day: dayVal + utcHours / 24.0)
+        let t = (jd - 2451545.0) / 36525.0
+        let solar = solarCoordinates(t: t)
+        
         let solarNoonUtc = 12.0 - (longitude / 15.0) - (solar.equationOfTime / 60.0)
         let hourAngleDeg = (utcHours - solarNoonUtc) * 15.0
         
@@ -239,19 +255,6 @@ public struct PrayerEngine: Sendable {
         let sinAlt = term1 + term2
             
         return asin(min(max(sinAlt, -1.0), 1.0)).toDegrees()
-    }
-    
-    private func dateFromUtcHours(_ utcHours: Double, on comps: DateComponents, timeZone: TimeZone) -> Date {
-        var baseComps = comps
-        baseComps.timeZone = TimeZone(secondsFromGMT: 0)
-        baseComps.hour = 0
-        baseComps.minute = 0
-        baseComps.second = 0
-        
-        let calendar = Calendar(identifier: .gregorian)
-        let baseDate = calendar.date(from: baseComps) ?? Date()
-        let seconds = (utcHours.truncatingRemainder(dividingBy: 24.0) + 24.0).truncatingRemainder(dividingBy: 24.0) * 3600.0
-        return baseDate.addingTimeInterval(seconds)
     }
 }
 

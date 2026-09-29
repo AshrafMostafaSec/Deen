@@ -3,7 +3,13 @@ import AVFoundation
 import MediaPlayer
 import Observation
 
-public enum PlaybackState: Sendable, Equatable {
+public enum AudioPlaybackSource: Sendable, Equatable {
+    case idle
+    case quran(surahName: String, reciterName: String, ayahNumber: Int)
+    case radio(station: RadioStation)
+}
+
+public enum AudioPlaybackState: Sendable, Equatable {
     case idle
     case preparing
     case playing
@@ -12,33 +18,33 @@ public enum PlaybackState: Sendable, Equatable {
     case failed(String)
 }
 
-public enum AudioPlaybackSource: Sendable, Equatable {
-    case quran(surahName: String, reciterName: String, ayahNumber: Int?)
-    case radio(stationName: String, stationID: String)
-}
-
 @MainActor
 @Observable
 public final class AudioService: NSObject {
     public static let shared = AudioService()
     
-    public private(set) var playbackState: PlaybackState = .idle
-    public private(set) var currentSource: AudioPlaybackSource?
+    public private(set) var currentSource: AudioPlaybackSource = .idle
+    public private(set) var playbackState: AudioPlaybackState = .idle
     public private(set) var currentTitle: String = ""
     public private(set) var currentSubtitle: String = ""
     public private(set) var isPlaying: Bool = false
     public private(set) var isLiveRadio: Bool = false
     
+    public var onAyahPlaybackFinished: (@MainActor () -> Void)?
+    
     private var player: AVPlayer?
-    private var playerItem: AVPlayerItem?
+    private var currentStation: RadioStation?
+    private var currentCandidateIndex: Int = 0
+    private var wasPlayingBeforeInterruption: Bool = false
+    
+    // KVO Observers
     private nonisolated(unsafe) var statusObservation: NSKeyValueObservation?
     private nonisolated(unsafe) var timeControlObservation: NSKeyValueObservation?
     
-    public override init() {
+    private override init() {
         super.init()
-        setupAudioSession()
         setupRemoteCommands()
-        setupNotifications()
+        setupAudioSessionObservers()
     }
     
     deinit {
@@ -50,102 +56,120 @@ public final class AudioService: NSObject {
     // MARK: - Public Playback API
     
     public func playRadio(station: RadioStation) {
-        guard let candidate = station.streamCandidates.first else {
-            playbackState = .failed("No valid stream candidate available")
+        self.currentStation = station
+        self.currentCandidateIndex = 0
+        playCurrentStationCandidate()
+    }
+    
+    private func playCurrentStationCandidate() {
+        guard let station = currentStation else { return }
+        let candidates = station.streamCandidates.sorted(by: { $0.priority < $1.priority })
+        guard currentCandidateIndex < candidates.count else {
+            self.playbackState = .failed("All stream candidates failed")
             return
         }
         
+        let candidate = candidates[currentCandidateIndex]
         teardownCurrentPlayback()
         
-        currentSource = .radio(stationName: station.name, stationID: station.id)
-        currentTitle = station.name
-        currentSubtitle = station.shortName ?? "Live Broadcast"
-        isLiveRadio = true
-        playbackState = .preparing
+        self.currentSource = .radio(station: station)
+        self.currentTitle = station.name
+        self.currentSubtitle = station.shortName ?? "Egyptian Radio"
+        self.isLiveRadio = true
+        self.playbackState = .preparing
         
         startPlayback(url: candidate.url, isLive: true)
     }
     
-    public func playQuranAudio(surahName: String, reciterName: String, audioURL: URL, ayahNumber: Int? = nil) {
+    public func playQuranAudio(surahName: String, reciterName: String, audioURL: URL, ayahNumber: Int) {
         teardownCurrentPlayback()
         
-        currentSource = .quran(surahName: surahName, reciterName: reciterName, ayahNumber: ayahNumber)
-        currentTitle = surahName
-        currentSubtitle = reciterName
-        isLiveRadio = false
-        playbackState = .preparing
+        self.currentSource = .quran(surahName: surahName, reciterName: reciterName, ayahNumber: ayahNumber)
+        self.currentTitle = surahName
+        self.currentSubtitle = reciterName
+        self.isLiveRadio = false
+        self.playbackState = .preparing
         
         startPlayback(url: audioURL, isLive: false)
     }
     
     public func togglePlayPause() {
-        guard let player = player else { return }
+        guard let player else { return }
         if isPlaying {
             player.pause()
-            isPlaying = false
-            playbackState = .paused
+            self.isPlaying = false
+            self.playbackState = .paused
             updateNowPlayingPlaybackRate(0.0)
         } else {
+            activateAudioSession()
             player.play()
-            isPlaying = true
-            playbackState = .playing
+            self.isPlaying = true
+            self.playbackState = .playing
             updateNowPlayingPlaybackRate(1.0)
         }
     }
     
     public func stop() {
         teardownCurrentPlayback()
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        self.currentSource = .idle
+        self.playbackState = .idle
+        self.currentTitle = ""
+        self.currentSubtitle = ""
+        self.isPlaying = false
+        self.isLiveRadio = false
+        clearNowPlaying()
     }
     
-    // MARK: - Private Player Mechanics
+    // MARK: - Core Playback Engine
     
     private func startPlayback(url: URL, isLive: Bool) {
         activateAudioSession()
         
-        let asset = AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": ["User-Agent": "DeenIslamicCompanion/1.0"]])
+        let asset = AVURLAsset(url: url)
         let item = AVPlayerItem(asset: asset)
-        self.playerItem = item
         
-        let player = AVPlayer(playerItem: item)
-        player.automaticallyWaitsToMinimizeStalling = true
-        self.player = player
-        
-        // Observe Player Item Status
-        statusObservation = item.observe(\.status, options: [.new, .old]) { [weak self] item, _ in
-            guard let self else { return }
-            Task { @MainActor in
-                switch item.status {
+        // Swift 6 safe: Extract values outside of @Sendable task
+        statusObservation = item.observe(\.status, options: [.new, .old]) { [weak self] observedItem, _ in
+            let status = observedItem.status
+            let errorMsg = observedItem.error?.localizedDescription
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                switch status {
                 case .readyToPlay:
-                    self.player?.play()
-                    self.isPlaying = true
                     self.playbackState = .playing
-                    self.updateNowPlayingInfo(isLive: isLive)
+                    self.isPlaying = true
+                    self.updateNowPlayingInfo()
                 case .failed:
-                    let err = item.error?.localizedDescription ?? "Playback failed"
-                    self.playbackState = .failed(err)
+                    if self.isLiveRadio, let station = self.currentStation {
+                        let candidatesCount = station.streamCandidates.count
+                        if self.currentCandidateIndex + 1 < candidatesCount {
+                            self.currentCandidateIndex += 1
+                            self.playCurrentStationCandidate()
+                            return
+                        }
+                    }
+                    self.playbackState = .failed(errorMsg ?? "Stream failed")
                     self.isPlaying = false
-                case .unknown:
-                    self.playbackState = .preparing
-                @unknown default:
+                default:
                     break
                 }
             }
         }
         
-        // Observe Time Control Status (Buffering vs Playing)
-        timeControlObservation = player.observe(\.timeControlStatus, options: [.new]) { [weak self] player, _ in
-            guard let self else { return }
-            Task { @MainActor in
-                switch player.timeControlStatus {
+        let newPlayer = AVPlayer(playerItem: item)
+        timeControlObservation = newPlayer.observe(\.timeControlStatus, options: [.new]) { [weak self] observedPlayer, _ in
+            let timeStatus = observedPlayer.timeControlStatus
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                switch timeStatus {
                 case .playing:
-                    self.isPlaying = true
                     self.playbackState = .playing
+                    self.isPlaying = true
                 case .paused:
-                    self.isPlaying = false
-                    if case .failed = self.playbackState {
-                        // Keep failure state
-                    } else {
+                    if self.playbackState != .idle {
                         self.playbackState = .paused
+                        self.isPlaying = false
                     }
                 case .waitingToPlayAtSpecifiedRate:
                     self.playbackState = .buffering
@@ -154,6 +178,27 @@ public final class AudioService: NSObject {
                 }
             }
         }
+        
+        // Listen for item completion (for Quran Ayahs)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleItemDidPlayToEnd),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: item
+        )
+        
+        // Listen for live radio stalls
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleItemPlaybackStalled),
+            name: .AVPlayerItemPlaybackStalled,
+            object: item
+        )
+        
+        self.player = newPlayer
+        newPlayer.play()
+        self.isPlaying = true
+        self.updateNowPlayingInfo()
     }
     
     private func teardownCurrentPlayback() {
@@ -162,91 +207,118 @@ public final class AudioService: NSObject {
         timeControlObservation?.invalidate()
         timeControlObservation = nil
         
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: nil)
+        
         player?.pause()
         player = nil
-        playerItem = nil
-        
-        isPlaying = false
-        playbackState = .idle
-        currentSource = nil
-        currentTitle = ""
-        currentSubtitle = ""
-        isLiveRadio = false
-        
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
     
-    // MARK: - System Integrations (AudioSession, RemoteCommands, Interruptions)
+    // MARK: - AVPlayer Item Handlers
     
-    private func setupAudioSession() {
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, policy: .longFormAudio)
-        } catch {
-            // Log audio session configuration error gracefully
+    @objc nonisolated private func handleItemDidPlayToEnd() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.isPlaying = false
+            self.playbackState = .paused
+            self.updateNowPlayingPlaybackRate(0.0)
+            self.onAyahPlaybackFinished?()
         }
     }
+    
+    @objc nonisolated private func handleItemPlaybackStalled() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            if self.isLiveRadio {
+                self.playbackState = .buffering
+                // Attempt soft resume
+                self.player?.play()
+            }
+        }
+    }
+    
+    // MARK: - Audio Session Configuration
     
     private func activateAudioSession() {
         do {
-            try AVAudioSession.sharedInstance().setActive(true)
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default, policy: .longFormAudio)
+            try session.setActive(true)
         } catch {
-            // Non-fatal
+            // Non-fatal, audio engine handles error gracefully
         }
     }
+    
+    // MARK: - Now Playing & Remote Command Center
     
     private func setupRemoteCommands() {
         let commandCenter = MPRemoteCommandCenter.shared()
         
         commandCenter.playCommand.addTarget { [weak self] _ in
-            Task { @MainActor in
-                self?.player?.play()
-                self?.isPlaying = true
-                self?.playbackState = .playing
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                if !self.isPlaying {
+                    self.togglePlayPause()
+                }
             }
             return .success
         }
         
         commandCenter.pauseCommand.addTarget { [weak self] _ in
-            Task { @MainActor in
-                self?.player?.pause()
-                self?.isPlaying = false
-                self?.playbackState = .paused
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                if self.isPlaying {
+                    self.togglePlayPause()
+                }
             }
             return .success
         }
         
         commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.togglePlayPause()
             }
             return .success
         }
     }
     
-    private func updateNowPlayingInfo(isLive: Bool) {
+    private func updateNowPlayingInfo() {
         var info = [String: Any]()
         info[MPMediaItemPropertyTitle] = currentTitle
         info[MPMediaItemPropertyArtist] = currentSubtitle
-        info[MPMediaItemPropertyAlbumTitle] = isLive ? "Egyptian Radio Live" : "The Holy Quran"
-        info[MPNowPlayingInfoPropertyIsLiveStream] = isLive
-        info[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
+        info[MPNowPlayingInfoPropertyIsLiveStream] = isLiveRadio
+        info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
         
-        if !isLive, let duration = playerItem?.duration, duration.isNumeric {
-            info[MPMediaItemPropertyPlaybackDuration] = CMTimeGetSeconds(duration)
-            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds(player?.currentTime() ?? .zero)
+        if let player = player, let currentItem = player.currentItem {
+            let currentTime = player.currentTime()
+            if currentTime.isNumeric {
+                info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds(currentTime)
+            }
+            let duration = currentItem.duration
+            if duration.isNumeric && !isLiveRadio {
+                info[MPMediaItemPropertyPlaybackDuration] = CMTimeGetSeconds(duration)
+            }
         }
         
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
     
     private func updateNowPlayingPlaybackRate(_ rate: Double) {
-        var info = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
         info[MPNowPlayingInfoPropertyPlaybackRate] = rate
+        if let player, player.currentTime().isNumeric {
+            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds(player.currentTime())
+        }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
     
-    private func setupNotifications() {
+    private func clearNowPlaying() {
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    }
+    
+    // MARK: - System Audio Session Notification Observers
+    
+    private func setupAudioSessionObservers() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleInterruption),
@@ -267,27 +339,28 @@ public final class AudioService: NSObject {
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
         
-        let shouldResume: Bool
-        if type == .ended,
-           let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-            shouldResume = options.contains(.shouldResume)
-        } else {
-            shouldResume = false
-        }
-        
         Task { @MainActor [weak self] in
             guard let self else { return }
             switch type {
             case .began:
-                self.player?.pause()
+                self.wasPlayingBeforeInterruption = self.isPlaying
                 self.isPlaying = false
                 self.playbackState = .paused
+                self.updateNowPlayingPlaybackRate(0.0)
             case .ended:
-                if shouldResume {
-                    self.player?.play()
-                    self.isPlaying = true
-                    self.playbackState = .playing
+                guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) && self.wasPlayingBeforeInterruption {
+                    if self.isLiveRadio {
+                        // Reconnect live stream
+                        self.playCurrentStationCandidate()
+                    } else {
+                        self.activateAudioSession()
+                        self.player?.play()
+                        self.isPlaying = true
+                        self.playbackState = .playing
+                        self.updateNowPlayingPlaybackRate(1.0)
+                    }
                 }
             @unknown default:
                 break
@@ -302,11 +375,14 @@ public final class AudioService: NSObject {
         
         Task { @MainActor [weak self] in
             guard let self else { return }
+            // Pause playback if headphones/AirPods disconnected
             if reason == .oldDeviceUnavailable {
-                // Headphones unplugged or Bluetooth disconnected -> pause immediately!
-                self.player?.pause()
-                self.isPlaying = false
-                self.playbackState = .paused
+                if self.isPlaying {
+                    self.player?.pause()
+                    self.isPlaying = false
+                    self.playbackState = .paused
+                    self.updateNowPlayingPlaybackRate(0.0)
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct PrayerView: View {
     @State private var viewModel = PrayerViewModel()
+    @Environment(\.locationService) private var locationService
     
     public init() {}
     
@@ -17,7 +18,7 @@ public struct PrayerView: View {
                 // Daily Prayer Interactive Tracker List
                 prayerTrackerSection
                 
-                // Astronomical Utility Grid (Qibla, Weekly stats, Qiyam)
+                // Astronomical Utility Grid (Qibla, Weekly stats)
                 astronomicalUtilityGrid
                 
                 // Spiritual Quote
@@ -25,9 +26,33 @@ public struct PrayerView: View {
             }
             .padding(.horizontal, AppSpacing.margin)
             .padding(.top, AppSpacing.spaceSm)
-            .padding(.bottom, 120)
+            .padding(.bottom, 170) // Ample clearance for floating mini-player & tab bar
         }
         .background(AppColor.background.ignoresSafeArea())
+        .onAppear {
+            viewModel.onAppear()
+            locationService.startHeadingUpdates()
+            updateFromLocation()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
+            locationService.stopHeadingUpdates()
+        }
+        .onChange(of: locationService.latitude) { _, _ in updateFromLocation() }
+        .onChange(of: locationService.longitude) { _, _ in updateFromLocation() }
+        .onChange(of: locationService.locationName) { _, _ in updateFromLocation() }
+        .onChange(of: locationService.isLocationAvailable) { _, _ in updateFromLocation() }
+        .onChange(of: locationService.headingDegrees) { _, newVal in
+            viewModel.updateHeading(newVal)
+        }
+    }
+    
+    private func updateFromLocation() {
+        viewModel.updateLocation(
+            latitude: locationService.latitude,
+            longitude: locationService.longitude,
+            name: locationService.locationName
+        )
     }
     
     // MARK: - Sections
@@ -51,7 +76,7 @@ public struct PrayerView: View {
             Spacer()
             
             Button {
-                // Settings sheet
+                // Settings action
             } label: {
                 Image(systemName: "slider.horizontal.3")
                     .font(.system(size: 16))
@@ -70,26 +95,26 @@ public struct PrayerView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "sun.max.fill")
                         .foregroundColor(AppColor.primary)
-                    Text("Next Prayer • Solar Depression \(viewModel.solarAngleText)")
+                    Text("Next • Solar Alt \(viewModel.solarAngleText)")
                         .font(AppFont.interfaceLabel(size: 12, weight: .semibold))
                         .foregroundColor(AppColor.onSurfaceVariant)
                 }
                 Spacer()
                 Text("LIVE")
                     .font(AppFont.technicalMetric(size: 10, weight: .bold))
-                    .foregroundColor(AppColor.primary)
+                    .foregroundColor(AppColor.error)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(AppColor.primaryContainer.opacity(0.5))
+                    .background(AppColor.errorContainer.opacity(0.35))
                     .clipShape(Capsule())
             }
             
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Fajr Prayer")
+                    Text(viewModel.nextPrayerName)
                         .font(AppFont.arabicHeading(size: 20))
                         .foregroundColor(AppColor.secondary)
-                    Text("04:48 AM")
+                    Text(viewModel.nextPrayerTime)
                         .font(AppFont.celestialDisplay(size: 38))
                         .foregroundColor(AppColor.onSurface)
                 }
@@ -166,7 +191,6 @@ public struct PrayerView: View {
             VStack(spacing: 8) {
                 ForEach(viewModel.prayerRecords) { record in
                     HStack(spacing: AppSpacing.spaceMd) {
-                        // Checkbox trigger
                         if record.kind.isObligatoryPrayer {
                             Button {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
@@ -234,26 +258,27 @@ public struct PrayerView: View {
                 VStack(spacing: 8) {
                     ZStack {
                         Circle()
-                            .strokeBorder(AppColor.primary.opacity(0.2), lineWidth: 2)
+                            .strokeBorder(viewModel.isAlignedWithQibla ? AppColor.primary : AppColor.primary.opacity(0.2), lineWidth: viewModel.isAlignedWithQibla ? 3 : 2)
                             .frame(width: 64, height: 64)
                         
                         Image(systemName: "location.north.line.fill")
                             .font(.system(size: 24))
-                            .foregroundColor(AppColor.primary)
+                            .foregroundColor(viewModel.isAlignedWithQibla ? AppColor.primary : AppColor.secondary)
                             .rotationEffect(.degrees(viewModel.qiblaDegrees - viewModel.currentDeviceHeading))
+                            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: viewModel.currentDeviceHeading)
                     }
                     
-                    Text("\(Int(viewModel.qiblaDegrees))° W")
+                    Text("\(Int(viewModel.qiblaDegrees))°")
                         .font(AppFont.celestialDisplay(size: 16))
                         .foregroundColor(AppColor.onSurface)
                     
-                    Text("Kaaba Qibla")
-                        .font(AppFont.interfaceLabel(size: 11))
-                        .foregroundColor(AppColor.secondary)
+                    Text(viewModel.isAlignedWithQibla ? "Aligned" : "Kaaba Qibla")
+                        .font(AppFont.interfaceLabel(size: 11, weight: viewModel.isAlignedWithQibla ? .bold : .medium))
+                        .foregroundColor(viewModel.isAlignedWithQibla ? AppColor.primary : AppColor.secondary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.spaceMd)
-                .astrolabeGlass(cornerRadius: AppRadius.card)
+                .astrolabeGlass(cornerRadius: AppRadius.card, showEmeraldGlow: viewModel.isAlignedWithQibla)
                 
                 // Weekly Compliance Stats
                 VStack(spacing: 8) {
@@ -273,11 +298,11 @@ public struct PrayerView: View {
                             .foregroundColor(AppColor.primary)
                     }
                     
-                    Text("Weekly Rate")
+                    Text("Today's Rate")
                         .font(AppFont.interfaceLabel(size: 13, weight: .semibold))
                         .foregroundColor(AppColor.onSurface)
                     
-                    Text("Consistent")
+                    Text(viewModel.weeklyComplianceRate >= 80 ? "Consistent" : "In Progress")
                         .font(AppFont.interfaceLabel(size: 11))
                         .foregroundColor(AppColor.secondary)
                 }

@@ -1,6 +1,7 @@
 import XCTest
 @testable import IslamicCompanion
 
+@MainActor
 final class CatalogAndContentTests: XCTestCase {
     
     func testQuranCatalogCompleteness() {

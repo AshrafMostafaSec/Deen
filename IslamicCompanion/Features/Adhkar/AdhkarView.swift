@@ -22,7 +22,7 @@ public struct AdhkarView: View {
             }
             .padding(.horizontal, AppSpacing.margin)
             .padding(.top, AppSpacing.spaceSm)
-            .padding(.bottom, 120)
+            .padding(.bottom, 170) // Clearance for floating tab bar & mini player
         }
         .background(AppColor.background.ignoresSafeArea())
         .sheet(item: $viewModel.selectedCategoryForSheet) { cat in
@@ -316,23 +316,18 @@ struct AdhkarCategoryDetailSheet: View {
                             VStack(alignment: .trailing, spacing: 10) {
                                 // Hadith Reference & Progress Badge
                                 HStack {
-                                    Button {
-                                        viewModel.incrementItem(item: item)
-                                    } label: {
-                                        HStack(spacing: 6) {
-                                            Image(systemName: isDone ? "checkmark.circle.fill" : "hand.tap.fill")
-                                                .font(.system(size: 12))
-                                            Text(isDone ? "Completed" : "\(count) / \(item.targetCount)")
-                                                .font(AppFont.technicalMetric(size: 12, weight: .bold))
-                                        }
-                                        .foregroundColor(isDone ? AppColor.onPrimary : AppColor.primary)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            Capsule().fill(isDone ? AppColor.primary : AppColor.primaryContainer.opacity(0.4))
-                                        )
+                                    HStack(spacing: 6) {
+                                        Image(systemName: isDone ? "checkmark.circle.fill" : "hand.tap.fill")
+                                            .font(.system(size: 12))
+                                        Text(isDone ? "Completed" : "\(count) / \(item.targetCount)")
+                                            .font(AppFont.technicalMetric(size: 12, weight: .bold))
                                     }
-                                    .buttonStyle(.plain)
+                                    .foregroundColor(isDone ? AppColor.onPrimary : AppColor.primary)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        Capsule().fill(isDone ? AppColor.primary : AppColor.primaryContainer.opacity(0.4))
+                                    )
                                     
                                     Spacer()
                                     
@@ -370,6 +365,15 @@ struct AdhkarCategoryDetailSheet: View {
                             .overlay {
                                 RoundedRectangle(cornerRadius: AppRadius.card, style: .continuous)
                                     .strokeBorder(isDone ? AppColor.primary.opacity(0.5) : AppColor.hairlineBorder, lineWidth: 1)
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewModel.incrementItem(item: item)
+                            }
+                            .contextMenu {
+                                Button("Reset Counter") {
+                                    viewModel.resetItem(item: item)
+                                }
                             }
                         }
                     }

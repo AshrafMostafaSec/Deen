@@ -4,50 +4,48 @@ import Observation
 @MainActor
 @Observable
 public final class TodayViewModel {
-    public var locationName: String = "Riyadh, Saudi Arabia"
-    public var hijriDateString: String = "14 Ramadan 1447 AH • 22 March"
-    public var greetingName: String = "Ahmed"
+    public var locationName: String = "Locating..."
+    public var hijriDateString: String = ""
     
     public var prayerSchedule: PrayerSchedule
-    public var countdownString: String = "01:26:14"
-    public var qiyamTimeString: String = "02:37 AM"
+    public var countdownString: String = "--:--:--"
+    public var qiyamTimeString: String = "--:-- AM"
     public var isQiyamAlarmEnabled: Bool = true
     
     // Quran Progress
-    public var quranSurahName: String = "Surah Al-Baqarah"
-    public var quranPage: Int = 28
-    public var quranCompletedPages: Int = 3
-    public var quranGoalPages: Int = 5
+    public var quranSurahName: String = "Surah Al-Kahf"
+    public var quranPage: Int = 293
+    public var quranCompletedPages: Int = 4
+    public var quranGoalPages: Int = 6
     
     // Adhkar Progress
-    public var adhkarTitle: String = "Evening Adhkar"
-    public var adhkarCompleted: Int = 12
-    public var adhkarTotal: Int = 24
-    
-    // Daily Hadith
-    public let dailyHadithText: String = "«أَحَبُّ الأَعْمَالِ إِلَى اللهِ أَدْوَمُهَا وَإِنْ قَلَّ»"
-    public let dailyHadithSource: String = "Sahih Muslim"
+    public var adhkarTitle: String = "Morning Adhkar"
+    public var adhkarCompleted: Int = 5
+    public var adhkarTotal: Int = 7
     
     private let engine = PrayerEngine()
     private var tickerTask: Task<Void, Never>?
-    private var remainingSeconds: Int = 5174
+    private var lastLatitude: Double = 24.7136
+    private var lastLongitude: Double = 46.6753
     
     public init() {
         let schedule = engine.calculateSchedule(
             date: Date(),
-            latitude: 24.7136,
-            longitude: 46.6753,
-            locationName: "Riyadh"
+            latitude: lastLatitude,
+            longitude: lastLongitude,
+            locationName: "Riyadh, Saudi Arabia"
         )
         self.prayerSchedule = schedule
-        self.remainingSeconds = schedule.nextPrayerCountdownSeconds
-        let hours = schedule.nextPrayerCountdownSeconds / 3600
-        let minutes = (schedule.nextPrayerCountdownSeconds % 3600) / 60
-        let seconds = schedule.nextPrayerCountdownSeconds % 60
-        self.countdownString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        updateCountdownString()
+        refreshDateStrings()
+    }
+    
+    deinit {
+        tickerTask?.cancel()
     }
     
     public func onAppear() {
+        refreshDateStrings()
         startCountdownTicker()
         updateRemindersAndQiyam()
     }
@@ -56,7 +54,10 @@ public final class TodayViewModel {
         stopCountdownTicker()
     }
     
+    /// Called when location updates
     public func updateLocation(latitude: Double, longitude: Double, name: String) {
+        self.lastLatitude = latitude
+        self.lastLongitude = longitude
         self.locationName = name
         self.prayerSchedule = engine.calculateSchedule(
             date: Date(),
@@ -64,14 +65,17 @@ public final class TodayViewModel {
             longitude: longitude,
             locationName: name
         )
-        self.remainingSeconds = prayerSchedule.nextPrayerCountdownSeconds
         updateCountdownString()
         updateRemindersAndQiyam()
     }
     
     public func toggleQiyamAlarm() {
         isQiyamAlarmEnabled.toggle()
-        updateRemindersAndQiyam()
+        if !isQiyamAlarmEnabled {
+            NotificationService.shared.cancelQiyamReminder()
+        } else {
+            updateRemindersAndQiyam()
+        }
     }
     
     public func updateRemindersAndQiyam() {
@@ -87,29 +91,75 @@ public final class TodayViewModel {
         }
     }
     
-    public func startCountdownTicker() {
+    private func startCountdownTicker() {
         stopCountdownTicker()
-        tickerTask = Task { @MainActor in
+        tickerTask = Task { @MainActor [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
-                if Task.isCancelled { break }
-                if self.remainingSeconds > 0 {
-                    self.remainingSeconds -= 1
-                    self.updateCountdownString()
-                }
+                guard let self else { break }
+                self.updateCountdownString()
             }
         }
     }
     
-    public func stopCountdownTicker() {
+    private func stopCountdownTicker() {
         tickerTask?.cancel()
         tickerTask = nil
     }
     
     private func updateCountdownString() {
-        let hours = remainingSeconds / 3600
-        let minutes = (remainingSeconds % 3600) / 60
-        let seconds = remainingSeconds % 60
+        let now = Date()
+        let remaining = Int(prayerSchedule.nextPrayer.date.timeIntervalSince(now))
+        
+        if remaining <= 0 {
+            // Auto advance
+            self.prayerSchedule = engine.calculateSchedule(
+                date: now,
+                latitude: lastLatitude,
+                longitude: lastLongitude,
+                locationName: locationName
+            )
+            return
+        }
+        
+        let hours = remaining / 3600
+        let minutes = (remaining % 3600) / 60
+        let seconds = remaining % 60
         self.countdownString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+    
+    public func refreshDateStrings() {
+        let now = Date()
+        let hijri = Calendar(identifier: .islamicUmmAlQura)
+        let hDay = hijri.component(.day, from: now)
+        let hMonth = hijri.component(.month, from: now)
+        let hYear = hijri.component(.year, from: now)
+        
+        let hijriMonthNames = ["", "Muharram", "Safar", "Rabi' I", "Rabi' II", "Jumada I", "Jumada II",
+                               "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhul Qi'dah", "Dhul Hijjah"]
+        let monthName = hMonth >= 1 && hMonth <= 12 ? hijriMonthNames[hMonth] : ""
+        
+        let greg = DateFormatter()
+        greg.dateFormat = "d MMMM"
+        greg.locale = Locale(identifier: "en_US")
+        let gregStr = greg.string(from: now)
+        
+        self.hijriDateString = "\(hDay) \(monthName) \(hYear) AH • \(gregStr)"
+        
+        // Contextual Adhkar by time of day
+        let hour = Calendar.current.component(.hour, from: now)
+        if hour >= 4 && hour < 12 {
+            self.adhkarTitle = "Morning Adhkar"
+            self.adhkarCompleted = 5
+            self.adhkarTotal = 7
+        } else if hour >= 12 && hour < 20 {
+            self.adhkarTitle = "Evening Adhkar"
+            self.adhkarCompleted = 3
+            self.adhkarTotal = 5
+        } else {
+            self.adhkarTitle = "Sleep Adhkar"
+            self.adhkarCompleted = 1
+            self.adhkarTotal = 3
+        }
     }
 }
