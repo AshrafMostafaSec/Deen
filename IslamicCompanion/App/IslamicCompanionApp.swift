@@ -21,7 +21,6 @@ struct IslamicCompanionApp: App {
                         environment.notificationService.scheduleDailyAdhkarReminders()
                     }
                 }
-                .environment(\.locationService, AppEnvironment.shared.locationService)
         }
     }
 }

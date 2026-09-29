@@ -11,7 +11,7 @@ public final class AppEnvironment {
     
     public init(
         audioService: AudioService = AudioService.shared,
-        locationService: LocationService = LocationService(),
+        locationService: LocationService = LocationService.shared,
         prayerEngine: PrayerEngine = PrayerEngine(),
         notificationService: NotificationService = NotificationService.shared
     ) {
@@ -19,17 +19,5 @@ public final class AppEnvironment {
         self.locationService = locationService
         self.prayerEngine = prayerEngine
         self.notificationService = notificationService
-    }
-}
-
-/// EnvironmentKey to inject LocationService into the SwiftUI environment
-private struct LocationServiceKey: EnvironmentKey {
-    static let defaultValue: LocationService? = nil
-}
-
-public extension EnvironmentValues {
-    var locationService: LocationService {
-        get { self[LocationServiceKey.self] ?? AppEnvironment.shared.locationService }
-        set { self[LocationServiceKey.self] = newValue }
     }
 }

@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct TodayView: View {
     @State private var viewModel = TodayViewModel()
-    @Environment(\.locationService) private var locationService
+    private var locationService = LocationService.shared
     
     public let onNavigateToQuran: () -> Void
     public let onNavigateToAdhkar: () -> Void

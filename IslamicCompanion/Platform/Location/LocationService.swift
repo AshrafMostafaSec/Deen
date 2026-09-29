@@ -5,6 +5,8 @@ import Observation
 @MainActor
 @Observable
 public final class LocationService: NSObject, CLLocationManagerDelegate {
+    public static let shared = LocationService()
+    
     // Default fallback: Riyadh, Saudi Arabia
     public static let fallbackLatitude: Double = 24.7136
     public static let fallbackLongitude: Double = 46.6753

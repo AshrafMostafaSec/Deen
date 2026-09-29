@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct PrayerView: View {
     @State private var viewModel = PrayerViewModel()
-    @Environment(\.locationService) private var locationService
+    private var locationService = LocationService.shared
     
     public init() {}
     
