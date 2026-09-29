@@ -40,10 +40,6 @@ public final class TodayViewModel {
         refreshDateStrings()
     }
     
-    deinit {
-        tickerTask?.cancel()
-    }
-    
     public func onAppear() {
         refreshDateStrings()
         startCountdownTicker()

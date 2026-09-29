@@ -1,18 +1,18 @@
 import Foundation
 
-public enum RadioCategory: String, Codable, Sendable {
+public enum RadioCategory: String, Codable, Sendable, Equatable {
     case quran = "quran"
     case general = "general"
     case commercial = "commercial"
 }
 
-public enum RadioStreamFormat: String, Codable, Sendable {
+public enum RadioStreamFormat: String, Codable, Sendable, Equatable {
     case mp3 = "mp3"
     case aac = "aac"
     case hls = "hls"
 }
 
-public struct RadioStreamCandidate: Codable, Sendable {
+public struct RadioStreamCandidate: Codable, Sendable, Equatable {
     public let url: URL
     public let format: RadioStreamFormat
     public let priority: Int
@@ -24,7 +24,7 @@ public struct RadioStreamCandidate: Codable, Sendable {
     }
 }
 
-public struct RadioStation: Identifiable, Codable, Sendable {
+public struct RadioStation: Identifiable, Codable, Sendable, Equatable {
     public let id: String
     public let name: String
     public let shortName: String?
@@ -64,7 +64,7 @@ public struct RadioStation: Identifiable, Codable, Sendable {
     }
 }
 
-public struct RadioCatalog: Codable, Sendable {
+public struct RadioCatalog: Codable, Sendable, Equatable {
     public let schemaVersion: Int
     public let generatedAt: String
     public let stations: [RadioStation]

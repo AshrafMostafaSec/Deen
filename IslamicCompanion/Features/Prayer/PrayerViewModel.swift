@@ -53,10 +53,6 @@ public final class PrayerViewModel {
         applySchedule(schedule)
     }
     
-    deinit {
-        tickerTask?.cancel()
-    }
-    
     public func onAppear() {
         startCountdownTicker()
     }
